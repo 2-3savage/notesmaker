@@ -125,6 +125,10 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     const dropHandler = async (e, board, item) => {
         e.preventDefault()
         if (dragMember){
+            if (item.members.filter(member => member.id === dragMember.id).length > 0){
+                setDragMember(null)
+                return
+            }
             await NoteService.addMemberInItem(dragMember.id, item.id)
             const index = board.table.indexOf(item)
             board.table[index].members.push(dragMember)
@@ -136,6 +140,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     return b
                 }
             ))
+            setDragMember(null)
         }
         if (dragBoard) {
             return
