@@ -77,20 +77,61 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             }
         }
     }
-    
-    function dragStartHendler(e, board, item) {
+    const [height, setHeight] = useState(null)
+    function dragStartHendler(e, board, item, index, i) {
+        if (modalDialog) return
         setCurrentBoard(board)
         setCurrentItem(item)
+        
+        document.getElementById(`${index}-${i}`).style.opacity = 0.3
+        setHeight(document.getElementById(`${index}-${i}`).getBoundingClientRect().height);
+        
+        
     }
-    function dragLeaveHandler(e){
-        e.target.style.boxShadow = 'none'
-    }
-    function dragEndHendler(e){
-        e.target.style.boxShadow = 'none'
-    }
-    function dragOverHandler(e, board, item){
+    function dragLeaveHandler(e, board, item){
         if (dragBoard) return
         if (dragMember)return
+        if (item === currentItem) return
+        e.target.style.boxShadow = 'none'
+    }
+    function dragEndHendler(e, index, i){
+        e.target.style.boxShadow = 'none'
+        document.getElementById(`${index}-${i}`).style.opacity = 1
+        if (elementDragFlag !== null){
+            document.getElementById(elementDragFlag).style.height = 0;
+            setElementDragFlag(null)
+        }
+        if (flagBoard !== null){
+            document.getElementById(flagBoard).style.height = 0;
+            setFlagBoard(null)
+        }
+    }
+    const [elementDragFlag, setElementDragFlag] = useState(null)
+    function dragOverHandler(e, board, item, index, i){
+        e.preventDefault()
+        if (dragBoard) return
+        if (dragMember)return
+        if (modalDialog)return
+        if (item === currentItem) {
+            if (elementDragFlag !== null){
+                document.getElementById(elementDragFlag).style.height = 0;
+            }
+            return
+        }
+        if (elementDragFlag !== `${index}-${i}`){
+            if (elementDragFlag !== null){
+                document.getElementById(elementDragFlag).style.height = 0;
+            }
+            if (board === currentBoard){
+                // Прописать стили для элементов своего же борда
+            }else{
+                setElementDragFlag(`${index}-${i}-1`)
+                document.getElementById(`${index}-${i}-1`).style.height = `${height}px`;
+            }
+            
+        }
+        
+
         const currentIndex = currentBoard.table.indexOf(currentItem) // Индекс преставляемого элемента
         const dropIndex = board.table.indexOf(item) // Индекс элемента на который наводятся
         setBoards(boards.map(
@@ -107,10 +148,47 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         
         e.preventDefault()
     }
-    function dragOverHandlerItems(e, board){
+    const [flagBoard, setFlagBoard] = useState(null)
+    const dragOverHandlerBoards = (e, board, index) => {
+        e.preventDefault()
+        if (dragMember)return
+        if (dragBoard) return
+        
+        const container = document.querySelector(".modal")
+        if (container?.contains(e.target) || e.target.classList.value == "img-item" || e.target.classList.value == "div_margin"  || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
+            if (flagBoard !== null){
+                document.getElementById(flagBoard).style.height = 0;
+                setFlagBoard(null)
+                
+            }
+            return
+        }
+        if (elementDragFlag !== null){
+            document.getElementById(elementDragFlag).style.height = 0;
+            setElementDragFlag(null)
+        }
+        if (flagBoard !== `${index}-board`){
+            
+            if (flagBoard !== null){
+                document.getElementById(flagBoard).style.height = 0;
+            }
+            if (board === currentBoard){
+                // Прописать стили для элементов своего же борда
+                setFlagBoard(`${index}-board`)
+            }
+            else{
+                setFlagBoard(`${index}-board`)
+                document.getElementById(`${index}-board`).style.height = `${height}px`
+            }
+            
+        }
+        
+    }
+    function dragOverHandlerItems(e, item, board){
         e.preventDefault()
         
     }
+    
     function formatDate(date) {
         const months = [
           'янв', 'фев', 'мар', 'апр', 'май', 'июн', 
@@ -141,6 +219,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                 }
             ))
             setDragMember(null)
+            return
         }
         if (dragBoard) {
             return
@@ -206,9 +285,10 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         }
         if (!currentItem) return
         const container = document.querySelector(".modal")
-        if (container?.contains(e.target) || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
+        if (container?.contains(e.target) || e.target.classList.value == "img-item" || e.target.classList.value == "div_margin" || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
             return
         }
+        
         e.target.style.boxShadow = 'none'
         if (currentBoard.id !== board.id){
             const fetchData = async () => {
@@ -673,12 +753,14 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             <div className={`app`}>
             {boards.sort((a, b) => a.position - b.position).map((board, index) => 
                 <div key={index}  
-                onDragOver={e => dragOverHandlerItems(e, board)} 
+                
+                onDragOver={e => dragOverHandlerBoards(e, board, index)} 
                 onDrop={e => dropCard(e, board)} 
                 className='items'>
                     <Tooltip place={'right'} id={`${index}-tag`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2,  pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
                     <div className="board" 
                     onDragStart={e => dragBoardStart(e, board)} 
+                    onDragOver={e => dragOverHandlerItems(e, board)} 
                     draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive? false : true : false}>
                         <HeaderItemBoard 
                             deleteBoardActive={deleteBoardActive}
@@ -707,16 +789,20 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                 </>}
                                 <div 
                                 style={elementActive === `${index}-${i}`? {zIndex: 1} : null}
-                                onDragStart={e => dragStartHendler(e, board, item)} 
-                                onDragLeave={e => dragLeaveHandler(e) }
-                                onDragEnd={e => dragEndHendler(e)} 
-                                onDragOver={e => dragOverHandler(e, board, item)} 
+                                onDragStart={e => dragStartHendler(e, board, item, index, i)} 
+                                onDragLeave={e => dragLeaveHandler(e, board, item) }
+                                onDragEnd={e => dragEndHendler(e, index, i)} 
+                                onDragOver={e => dragOverHandler(e, board, item, index, i)} 
                                 onDrop={e => dropHandler(e, board, item)}
                                 draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive === `${index}-${i}` ? false : true : false} 
                                 id={`${index}-${i}`}
                                 className={`item text element` + `${tagsOpen}`}
                                 onClick={(e) => {(editHandler(e, index, i));}}
                                 >
+                                    <div className="div_margin" id={`${index}-${i}-1`}>
+                                        
+                                    </div>
+                                    <div className='item_2'>
                                     <ModalDialogBoard isOpen={modalDialog.includes(`${index}-${i}`)} onClose={() => {closeEditHandler(index, i); setChangeMenuBoardPositionItemClose(); setChangeMenuBoardPositionItemInLink(false)}}>
                                         <InModalDoalogBoard 
                                         setMembers={setMembers}
@@ -812,18 +898,23 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                             }
 
                                         </div>
+                                        
                                         <div className="grip_members">
                                                 {item.members?.map((item, index) =>
                                                     <div className="image_div_" key={index}>
-                                                        <img className='image_members_' src={item.user.avatar}/>
+                                                        <img draggable={false} className='image_members_' src={item.user.avatar}/>
                                                     </div>
                                                 )}
                                         </div>
                                         
+                                        </div>
                                     </div>
                                 </div>
-                            
+                                
                             </div>)}
+                            <div className="item_preview_pos" id={`${index}-board`}>
+
+                            </div>
                             <AddNewItemInput 
                             setNewItems={setNewItems}
                             index={index}

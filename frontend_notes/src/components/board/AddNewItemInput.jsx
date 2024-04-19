@@ -25,7 +25,7 @@ const AddNewItemInput = ({ index, setNewItems, board,  newItems, setInputValue, 
     <>
         {newItems[index] && (
             <>
-                <div className='item_2 text'>
+                <div className='item_3 text'>
                     <input id="input_add" onKeyDown={handleKeyPress} ref={contentRefsInput} onChange={(e) => {setInputValue(e.target.value)}} type="text" className='input' placeholder='Введите заголовок'></input>
                 </div>
                 <div className='add_item_div_'>

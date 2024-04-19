@@ -794,7 +794,7 @@ def updateItemDragOnDropItemInBoard(request, board_id, item_id, item_id_2):
 
 @api_view(['POST'])
 def updateItemDropInBoard(request, board_id, table_id, table_id_2, item_id):
-    # Функция для перемещения элемента в другую таблицу через выкидывание на таблицу
+    # Функция для перемещения элемента в другую таблицу через выкидывание на таблицу table_id_2 - куда, table_id - откуда
     table = Table.objects.get(id=table_id) 
     table_2 = Table.objects.get(id=table_id_2) 
     # Смотрим количество записей в определенном столбце куда перекидываем

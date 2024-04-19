@@ -106,8 +106,23 @@ body.dark .boards_app{
 .icon_close_div:hover{
     background: var( --transparent-background);
 }
-
-.item {
+.div_margin{
+    transition: var(--tran-01);
+    border-radius: 6px;
+    width: 245px;
+    margin: 5px 0;
+    background-color: var(--background-btn);
+    
+}
+.item_preview_pos{
+    transition: var(--tran-01);
+    border-radius: 6px;
+    width: 245px;
+    margin: 5px 0;
+    background-color: var(--background-btn);
+   
+}
+.item_2 {
     width: 245px;
     border: var(--border);
     border-radius: 6px;
@@ -120,7 +135,7 @@ body.dark .boards_app{
     flex-direction: column;
     position: relative;
 }
-.item:hover{
+.item_2:hover{
     border: var(--item-color-hover);
 }
 .cover{
@@ -389,7 +404,8 @@ body.dark .boards_app{
     cursor: pointer;
     transition: var(--tran-04);
 }
-.item:hover .div_icon_item{
+
+.item_2:hover .div_icon_item{
     opacity: 1;
     transition: var(--tran-04);
 }
@@ -554,7 +570,36 @@ body.dark .boards_app{
     right: 120px;
     margin-bottom: 10px;
 }
-
+.input{
+    height: 100%;
+    width: 100%;
+    padding: 8px;
+    resize: none;
+    outline: none;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    
+    background: var(--input_color);
+    transition: var(--tran-05);
+    color: var(--text-input);
+}
+.item_3{
+    width: 245px;
+    height: 45px;
+    padding: 10px;
+    border: var(--border);
+    border-radius: 6px;
+    margin: 5px 0;
+    cursor: pointer;
+    min-height: 36px;
+    transition: var(--tran-04);
+    background-color: var(--board-color-items);
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+}
 .textarea_modal_dialog{
     height: 100%;
     width: 100%;

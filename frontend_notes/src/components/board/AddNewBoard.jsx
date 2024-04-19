@@ -32,7 +32,7 @@ const AddNewBoard = ({ newBoard, setNewBoard, setInputBoardNameValue, addBoard }
             {newBoard && (
             
             <div className="new_board_div">
-                <div className='item_2 text'>
+                <div className='item_3 text'>
                         <input ref={contentRefs} onKeyDown={handleKeyPress} onChange={(e) => {setInputBoardNameValue(e.target.value)}} type="text" id="input" className='input' placeholder='Введите заголовок'></input>
                 </div>
                 <div className='add_item_div'>
