@@ -1,0 +1,82 @@
+html,body{
+    margin: 0;
+    height: 100vh;
+    max-height: 100vh;
+    background: var(--body-color);
+    transition: var(--tran-05);
+}
+* {
+    box-sizing: border-box;
+    
+}
+body.dark {
+    
+    --preview-color: #161A1D;
+    --body-color: #3d4247;
+    --sidebar-color: #242526;
+    --button-color: #FFF;
+    --primary-color: #3A3B3C;
+    --primary-color-light: #3A3B3C;
+    --toggle-color: #FFF;
+    --background-scroll-color: #DDD;
+    --text-color: #CCC;
+    --text-color-black: #1D2125;
+    --scroll-color: #808080;
+    --board-color: #101204;
+    --board-color-items: #22272B;
+    --icon-color: #DEE4EA;
+    --item-color-hover: 1px solid #479ade;
+    --color-datepicker: #4BCE97;
+    --create-page-color: #282E33;
+    --ds-border: #A6C5E229;
+    --border: 1px solid rgb(0, 0, 0);
+    --transparent-background: rgba(129, 119, 119, 0.180);
+    --background-btn: #A1BDD914;
+    --ds-text-subtle: #9FADBC;
+    --input_color:#22272B;
+    --dynamic-text-create-page: #B6C2CF;
+    --background-btn-hover: #a1bdd93a;
+    --text-input: #CCC;
+    --text-modal_dialog-item: #9FADBC;
+}
+:root{
+    --text-modal_dialog-item: #44546F;
+    --dynamic-text-transparent: hsla(218,54%,19.6%,0.16);
+    --text-input: #172B4D;
+    --background-btn-hover: #172b4d47;
+    --background-btn: #091E420F;
+    --input_color:#e6e6e6;
+    --ds-text-subtle: #44546f;
+    --create-page-color: #FFFFFF;
+    --ds-border: #091E4224;
+    --text_user_info: #1D2125;
+    --background-user-modal: #579DFF;
+    --dynamic-text: #172B4D;
+    --dynamic-text-create-page: #172B4D;
+    --delete-color: #C9372C;
+    --preview-color: #F7F8F9;
+    --body-color: #eaedf7;
+    --sidebar-color: #FFF;
+    --button-color: #FFF;
+    --primary-color: #d3d3d3;
+    --primary-color-light: #F6F5FF;
+    --toggle-color: #DDD;
+    --background-scroll-color: #DDD;
+    --text-color: #707070;
+    --icon-color: #091E42;
+    --text-color-black: #1D2125;
+    --scroll-color: #808080;
+    --board-color: #f1f2f4;
+    --board-color-items: #FFFFFF;
+    --color-datepicker: #4BCE97;
+    --item-color-hover: 1px solid #1a1818;
+    --border: 1px solid lightgray;
+    --transparent-background: rgba(76, 68, 68, 0.180);
+    --tran-02: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.4s ease;
+    --tran-05: all 0.5s ease;
+    --tran-06: all 0.7s ease;
+}
+
+
