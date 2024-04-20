@@ -110,9 +110,16 @@ body.dark .boards_app{
     transition: var(--tran-01);
     border-radius: 6px;
     width: 245px;
-    margin: 5px 0;
     background-color: var(--background-btn);
     
+}
+.focused{
+    outline: 2px solid var(--ds-border-focused);
+    transition: var(--tran-01);
+}
+.margin{
+    height: 5px;
+    width: 245px;
 }
 .item_preview_pos{
     transition: var(--tran-01);
@@ -126,7 +133,6 @@ body.dark .boards_app{
     width: 245px;
     border: var(--border);
     border-radius: 6px;
-    margin: 5px 0;
     cursor: pointer;
     min-height: 36px;
     transition: var(--tran-04);
@@ -587,6 +593,7 @@ body.dark .boards_app{
 }
 .item_3{
     width: 245px;
+    
     height: 45px;
     padding: 10px;
     border: var(--border);

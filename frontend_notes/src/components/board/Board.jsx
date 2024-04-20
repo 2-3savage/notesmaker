@@ -79,11 +79,12 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     }
     const [height, setHeight] = useState(null)
     function dragStartHendler(e, board, item, index, i) {
-        if (modalDialog) return
         setCurrentBoard(board)
         setCurrentItem(item)
+        if (modalDialog.length === 0) {
+            document.getElementById(`${index}-${i}`).style.opacity = 0.3
+        }
         
-        document.getElementById(`${index}-${i}`).style.opacity = 0.3
         setHeight(document.getElementById(`${index}-${i}`).getBoundingClientRect().height);
         
         
@@ -99,34 +100,48 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         document.getElementById(`${index}-${i}`).style.opacity = 1
         if (elementDragFlag !== null){
             document.getElementById(elementDragFlag).style.height = 0;
+            document.getElementById(elementDragFlag).style.marginBottom = 0;
             setElementDragFlag(null)
         }
         if (flagBoard !== null){
             document.getElementById(flagBoard).style.height = 0;
             setFlagBoard(null)
         }
+        if (focusedBoard !== null){
+            document.getElementById(focusedBoard).classList.remove("focused")
+        }
     }
     const [elementDragFlag, setElementDragFlag] = useState(null)
+    const [flagBoard, setFlagBoard] = useState(null)
+    const [focusedBoard, setFocusedBoard] = useState(null)
     function dragOverHandler(e, board, item, index, i){
         e.preventDefault()
         if (dragBoard) return
-        if (dragMember)return
-        if (modalDialog)return
+        if (dragMember) return
+        // Если тот же элемент то все стили убираем у старого элемента
         if (item === currentItem) {
             if (elementDragFlag !== null){
                 document.getElementById(elementDragFlag).style.height = 0;
+                document.getElementById(elementDragFlag).style.marginBottom = 0;
             }
             return
         }
+        // Если старый элемент не равен нынешнему
         if (elementDragFlag !== `${index}-${i}`){
+            // Если он не начальный, то нам надо убрать у старого элемента стили
             if (elementDragFlag !== null){
                 document.getElementById(elementDragFlag).style.height = 0;
+                document.getElementById(elementDragFlag).style.marginBottom = 0;
             }
+            // Если это тот же борд
             if (board === currentBoard){
                 // Прописать стили для элементов своего же борда
-            }else{
+            } 
+            // Если это другой борд, то нам надо записать элемент и дать ему стили
+            else{
                 setElementDragFlag(`${index}-${i}-1`)
                 document.getElementById(`${index}-${i}-1`).style.height = `${height}px`;
+                document.getElementById(`${index}-${i}-1`).style.marginBottom = `${5}px`;
             }
             
         }
@@ -148,37 +163,51 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         
         e.preventDefault()
     }
-    const [flagBoard, setFlagBoard] = useState(null)
+    
     const dragOverHandlerBoards = (e, board, index) => {
         e.preventDefault()
+        
         if (dragMember)return
         if (dragBoard) return
         
         const container = document.querySelector(".modal")
-        if (container?.contains(e.target) || e.target.classList.value == "img-item" || e.target.classList.value == "div_margin"  || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
+        // если попал на элемент то нужно снять с борда стиль
+        if (container?.contains(e.target) || e.target.classList.value == "img-item" || e.target.classList.value == "item_2" || e.target.classList.value == "div_margin"  ||  e.target.classList.value == "margin" || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
             if (flagBoard !== null){
                 document.getElementById(flagBoard).style.height = 0;
                 setFlagBoard(null)
-                
             }
+            
             return
         }
+        // если не попал на элемент то нужно проверить был ли стиль на элементе и снять если был
         if (elementDragFlag !== null){
             document.getElementById(elementDragFlag).style.height = 0;
+            document.getElementById(elementDragFlag).style.marginBottom = 0;
             setElementDragFlag(null)
         }
+        // если поменялся борд
         if (flagBoard !== `${index}-board`){
-            
+            // если не равен, то надо у старого убрать стили
             if (flagBoard !== null){
                 document.getElementById(flagBoard).style.height = 0;
             }
+            if (focusedBoard !== null){
+                document.getElementById(focusedBoard).classList.remove("focused")
+            }
+            // если это тот же борд
             if (board === currentBoard){
                 // Прописать стили для элементов своего же борда
                 setFlagBoard(`${index}-board`)
+                document.getElementById(`${index}-board-focus`).classList.add("focused")
+                setFocusedBoard(`${index}-board-focus`)
             }
+            // если это другой борд, то нам надо записать элемент и дать ему стили
             else{
                 setFlagBoard(`${index}-board`)
+                document.getElementById(`${index}-board-focus`).classList.add("focused")
                 document.getElementById(`${index}-board`).style.height = `${height}px`
+                setFocusedBoard(`${index}-board-focus`)
             }
             
         }
@@ -278,6 +307,10 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         setNewBoardChange(e.target.value) // название выбранной таблицы
     }
     function dropCard(e, board){
+        if (dragMember) {
+            setDragMember(null)
+            return
+        }
         if (dragBoard) {
             changeBoards(board)
             setDragBoard(false)  
@@ -749,11 +782,9 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     return (
         <div className='boards_app' style={{ backgroundImage: `url(${backgroundImage})` }} >
             <CoverItem setDragMember={setDragMember} setUser={setUser} userInfo={userInfo} setStar={setStar} star={star} title={title} user={user} chosenEmoji={chosenEmoji} emojiOpen={emojiOpen} onEmojiClick={onEmojiClick} setEmojiOpen={setEmojiOpen} id={id}  />
-
             <div className={`app`}>
             {boards.sort((a, b) => a.position - b.position).map((board, index) => 
                 <div key={index}  
-                
                 onDragOver={e => dragOverHandlerBoards(e, board, index)} 
                 onDrop={e => dropCard(e, board)} 
                 className='items'>
@@ -761,6 +792,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     <div className="board" 
                     onDragStart={e => dragBoardStart(e, board)} 
                     onDragOver={e => dragOverHandlerItems(e, board)} 
+                    id={`${index}-board-focus`} 
                     draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive? false : true : false}>
                         <HeaderItemBoard 
                             deleteBoardActive={deleteBoardActive}
@@ -788,7 +820,6 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                     
                                 </>}
                                 <div 
-                                style={elementActive === `${index}-${i}`? {zIndex: 1} : null}
                                 onDragStart={e => dragStartHendler(e, board, item, index, i)} 
                                 onDragLeave={e => dragLeaveHandler(e, board, item) }
                                 onDragEnd={e => dragEndHendler(e, index, i)} 
@@ -799,10 +830,14 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                 className={`item text element` + `${tagsOpen}`}
                                 onClick={(e) => {(editHandler(e, index, i));}}
                                 >
+                                    <div className="margin">
+                                        
+                                    </div>
                                     <div className="div_margin" id={`${index}-${i}-1`}>
                                         
                                     </div>
-                                    <div className='item_2'>
+                                    
+                                    <div className='item_2' style={elementActive === `${index}-${i}`? {zIndex: 2} : null}>
                                     <ModalDialogBoard isOpen={modalDialog.includes(`${index}-${i}`)} onClose={() => {closeEditHandler(index, i); setChangeMenuBoardPositionItemClose(); setChangeMenuBoardPositionItemInLink(false)}}>
                                         <InModalDoalogBoard 
                                         setMembers={setMembers}
@@ -909,6 +944,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                         
                                         </div>
                                     </div>
+                                    <div ></div>
                                 </div>
                                 
                             </div>)}
@@ -1038,7 +1074,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     tagEditInTag={tagEditInTag}
                     setTagEditInTag={setTagEditInTag}
                 />
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex:0 }}></div>
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 0 }}></div>
                 </>
             )}
         </div>

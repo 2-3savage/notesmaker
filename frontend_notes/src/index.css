@@ -40,6 +40,7 @@ body.dark {
     --text-modal_dialog-item: #9FADBC;
 }
 :root{
+    --ds-border-focused: #388BFF;
     --text-modal_dialog-item: #44546F;
     --dynamic-text-transparent: hsla(218,54%,19.6%,0.16);
     --text-input: #172B4D;
