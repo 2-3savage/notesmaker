@@ -66,7 +66,6 @@ const TagEdit = ({id, elementPosition, tags, board, item, colors, boards, newTag
         const fetchData = async () => {
             try {
                 const data = await NoteService.createTag({text: textTag, color: newTag.color_text, item: board.table[index].id, board: id})
-                console.log(data)
                 board.table[index].tag.push({id: data.tag_page.id, text: data.tag_page.text, color: data.tag_page.color})
                 setTags([...tags, {id: data.tag_page.id,text: data.tag_page.text, color: data.tag_page.color}])
             }

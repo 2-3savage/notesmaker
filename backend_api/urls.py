@@ -35,7 +35,7 @@ urlpatterns = [
     path('page/<int:user_id>/board/<int:board_id>/remove/', views.removeBoardUser, name='remove-board-user'),
     path('page/<int:user_id>/board/<int:board_id>/update/', views.updateBoardUser, name='update-board-user'),
     path('search/user/<str:email>/', views.searchUser, name='search-user'),
-
+    path('invations/<int:board_id>/board', views.getBoardInvations, name='get-invations'),
     path('update/<int:board_id>/<int:table_id>/<int:table_id_2>/tables', views.updateBoardChange, name='update-board-change'),
     path('update/<int:board_id>/<int:tables_id>/<int:tables_id_2>/<int:item_id>/<int:item_id_2>/item', views.updateItemDragOnDropItem, name="update-item-drag-on-drop"),
     path('update/<int:board_id>/<int:item_id>/<int:item_id_2>/item', views.updateItemDragOnDropItemInBoard, name="update-item-drag-on-drop-board"),
@@ -49,6 +49,7 @@ urlpatterns = [
     path('tag/<int:pk>/delete', views.deleteTag, name="delete-tag"),
     path('user/<int:user_id>/board_like/<int:board_like_id>/remove/', views.removeBoardLike, name='remove_board_like'),
     path('tag/item/remove/', views.removeTagInItem, name='remove-tag'),
+    path('board/<int:board_id>/delete', views.deleteBoard, name='delete-board'),
 
     path('item/<int:user_id>/add/<int:item_id>/', views.addMemberInItem, name='add-members'),
     path('item/<int:user_id>/remove/<int:item_id>/', views.removeMemberFromItem, name='remove-members'),

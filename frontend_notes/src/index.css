@@ -10,7 +10,7 @@ html,body{
     
 }
 body.dark {
-    
+    --table-color: #1D2125;
     --preview-color: #161A1D;
     --body-color: #3d4247;
     --sidebar-color: #242526;
@@ -38,8 +38,17 @@ body.dark {
     --background-btn-hover: #a1bdd93a;
     --text-input: #CCC;
     --text-modal_dialog-item: #9FADBC;
+    --button-choice: #454F59;
+    --btn-role-color-active: #579DFF;
+    --btn-role-background-active: #1C2B41;
+    --text-disabled: #BFDBF847;
 }
 :root{
+    --text-disabled: #091E424F;
+    --btn-role-color-active: #0C66E4;
+    --btn-role-background-active: #E9F2FF;
+    --table-color: #ffffff;
+    --button-choice: #DCDFE4;
     --ds-border-focused: #388BFF;
     --text-modal_dialog-item: #44546F;
     --dynamic-text-transparent: hsla(218,54%,19.6%,0.16);

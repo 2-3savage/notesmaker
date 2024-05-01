@@ -715,7 +715,7 @@ header.open2 .marketing_hub_container1{
 .input{
     white-space: nowrap;
     background: rgba(255, 255, 255, 0);
-    color: var(--text-color);
+    color: var(--text-input);
     border:0;
     outline:0;
     height: 40px;

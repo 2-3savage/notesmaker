@@ -1,6 +1,25 @@
 import axios from 'axios'
 
 export const NoteService = {
+    async getInvations(boardId) {
+        const response = await fetch(`http://127.0.0.1:8000/api/invations/${boardId}/board`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        return response.json()
+    },
+    async deleteBoard(authTokens, boardId) {
+        const response = await fetch(`http://127.0.0.1:8000/api/board/${boardId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authTokens.access)
+            }
+        })
+        return response.json()
+    },
     async addMemberInItem(userId, itemId){
         const response = await fetch(`http://127.0.0.1:8000/api/item/${userId}/add/${itemId}/`, {
             method: 'POST',

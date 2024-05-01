@@ -7,9 +7,8 @@ import { AiFillStar, AiOutlineUser, AiOutlineTeam, AiOutlineProject, AiOutlineSt
 import '../styles/pages.css'
 import NewBoard from '../components/pages/NewBoard';
 const Home = () => {
-  let {logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
+  let {setListPages, listPages, logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
   let user = localStorage.getItem('authTokens') ?  jwtDecode(localStorage.getItem('authTokens')) : null
-  const [listPages, setListPages] = useState(null)
   
   const [modalInfoIsOpen, setModalInfoIsOpen] = useState(false) // modal dialog
   const handleStar = async (boardId) => {
@@ -46,6 +45,7 @@ const Home = () => {
           }
           else{
             setListPages(data.boards_not_like)
+            setFavoritePages(data.boards_like)
             setUserInfo(data2)
           }
       }

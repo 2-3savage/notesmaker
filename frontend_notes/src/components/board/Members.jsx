@@ -41,7 +41,7 @@ const Members = ({setBoards, boards, user, item, board, setMembers}) => {
         <Link onClick={() => {setMembers(false)}} className='icon_close_div'>
             <AiOutlineClose className='icon_close'></AiOutlineClose>
         </Link> 
-        {item?.members.length > 0 ? 
+        {item?.members?.length > 0 ? 
         <div>
           <div className='title_members'>
             <span className='text_members'>Участники карточки</span>

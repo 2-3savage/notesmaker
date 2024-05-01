@@ -250,6 +250,31 @@ def getUserInBoard(request, board_id):
     
     return Response(user_data)
 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteBoard(request, board_id):
+    user = request.user
+    board = Board.objects.get(id=board_id)
+    user_profile = UserProfile.objects.get(user=user)
+    rights_to_change = user_profile.rights.get(board=board)
+    if rights_to_change.right == "creator":
+        board.delete()
+        board = Board.objects.filter(users=user)
+        serializer = BoardSerializer(board, many=True)
+        for data in serializer.data:
+            current_board_id = data['id']
+            for user_data in data['users']:
+                board_like_ids = [board['id'] for board in user_data['user']['board_like']]
+                user_data['user']['like_board'] = current_board_id in board_like_ids
+                user_data['user'].pop('board_like', None)  
+                for right in user_data['user']['rights']:
+                    if right['board']['id'] == current_board_id:
+                        user_data['user']['rights'] = right['right']
+        return Response(serializer.data)
+    else:
+        return Response("Недостаточно прав")
+
 @api_view(['POST'])
 def createBoard(request):
     data = request.data
@@ -270,7 +295,6 @@ def createInvitations(request, user_id, board_id):
     user_invitee = User.objects.get(id=user_id)  # тот, кому прислали приглашение
     if user_invitee == user_inviter:
         return Response("Нельзя посылать приглашения самому себе")
-
     board = Board.objects.get(id=board_id)
     if board.users.filter(id=user_invitee.id).exists():
         return Response("Такой пользователь уже есть на доске")
@@ -281,6 +305,8 @@ def createInvitations(request, user_id, board_id):
     except Invitation.DoesNotExist:
         invite = Invitation.objects.create(inviter=user_inviter, invitee=user_invitee, board=board)
         serializer = InvitationSerializer(invite, many=False)
+        invitations = Invitation.objects.filter(board=board).order_by('-timestamp')
+        serializer = InvitationSerializer(invitations, many=True)
         return Response(serializer.data)
 
 @api_view(['PUT'])
@@ -336,15 +362,17 @@ def responseInvitations(request, user_id, board_id):
         serializer = UserSerializer(user_invitee, many=False)
         user_data = serializer.data
         user_data['invitations'] = InvitationSerializer(invitations_as_invitee, many=True).data 
+        invitations_as_invitee = Invitation.objects.filter(invitee=user_invitee).order_by('-timestamp')
+        invitations_as_invitee.delete()
+
         return Response(user_data)
     else:
-        deletion_time = timezone.now() + timedelta(hours=48)  # Например, установим таймер на удаление через 24 часа
-        invitation.deletion_time = deletion_time
-        invitation.save()
         invitations_as_invitee = Invitation.objects.filter(invitee=user_invitee).order_by('-timestamp')
         serializer = UserSerializer(user_invitee, many=False)
         user_data = serializer.data
         user_data['invitations'] = InvitationSerializer(invitations_as_invitee, many=True).data 
+        invitations_as_invitee = Invitation.objects.filter(invitee=user_invitee).order_by('-timestamp')
+        invitations_as_invitee.delete()
         return Response(user_data)
     
 @api_view(['POST'])
@@ -475,7 +503,12 @@ def addBoardUser(request, board_id, user_id):
     return Response(serializer.data["users"])
 
 
-
+@api_view(['GET'])
+def getBoardInvations(request, board_id):
+    board = Board.objects.get(id=board_id)
+    invitations = Invitation.objects.filter(board=board).order_by('-timestamp')
+    serializer = InvitationSerializer(invitations, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def searchUser(request, email):

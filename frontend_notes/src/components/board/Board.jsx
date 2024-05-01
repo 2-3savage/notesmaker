@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
-import { AiOutlineBorder, AiOutlineEye,AiOutlinePaperClip, AiOutlineTeam, AiOutlineCheckSquare, AiOutlineDelete, AiOutlineTag, AiOutlineClockCircle, AiOutlineAlignLeft, AiOutlinePlus, AiOutlineEdit,AiOutlineCreditCard, AiOutlineArrowRight, AiFillTag, AiOutlineInsertRowLeft, AiFillPlusCircle,  AiOutlineEllipsis, AiOutlineClose } from 'react-icons/ai'
+import { AiOutlineBorder, AiOutlineHolder, AiOutlineEye,AiOutlinePaperClip, AiOutlineTeam, AiOutlineCheckSquare, AiOutlineDelete, AiOutlineTag, AiOutlineClockCircle, AiOutlineAlignLeft, AiOutlinePlus, AiOutlineEdit,AiOutlineCreditCard, AiOutlineArrowRight, AiFillTag, AiOutlineInsertRowLeft, AiFillPlusCircle,  AiOutlineEllipsis, AiOutlineClose } from 'react-icons/ai'
 import  ModalDialogBoard  from './ModalDialogBoard'
 import  CoverItem  from './CoverItem';
 import AddNewBoard from './AddNewBoard';
@@ -18,6 +18,8 @@ import { NoteService } from '../../services/note.service'
 import AuthContext from '../context/AuthContext';
 import AddNewItemInput from './AddNewItemInput';
 import Members from './Members';
+import Charts from './Charts';
+
 // TODO: 
 // добавить сохранение смайла в boards
 // добавить загрузку изображения
@@ -25,7 +27,11 @@ import Members from './Members';
 // убрать перекликивание в модальном окне тип 1 раз тыкнул открыл, другой - закрыл.
 
 const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
+    
     let {authTokens, setFavoritePages} = useContext(AuthContext)
+
+    const [choiceView, setChoiceView] = useState("Доска")
+
     const [userInfo, setUserInfo] = useState(null)
     const [star, setStar] = useState(false)
     const containerRef = useRef([]);
@@ -79,15 +85,12 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     }
     const [height, setHeight] = useState(null)
     function dragStartHendler(e, board, item, index, i) {
-        setCurrentBoard(board)
         setCurrentItem(item)
+        setCurrentBoard(board)
         if (modalDialog.length === 0) {
             document.getElementById(`${index}-${i}`).style.opacity = 0.3
         }
-        
         setHeight(document.getElementById(`${index}-${i}`).getBoundingClientRect().height);
-        
-        
     }
     function dragLeaveHandler(e, board, item){
         if (dragBoard) return
@@ -110,6 +113,21 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         if (focusedBoard !== null){
             document.getElementById(focusedBoard).classList.remove("focused")
         }
+        setCurrentItem(null)
+        setCurrentBoard(null)
+        
+    }
+    const dragBoardStart = (e, board, index) => {
+        if (e.target.className === "board"){
+            setOldBoardChange(board)
+            setMenuBoard([])
+            setDragBoard(true)
+            setNewBoard(false)
+            setNewItems(false)
+        }
+    }
+    const dragBoardEnd = (e, board, index) => {
+        document.getElementById(`${index}-board-focus`).style.opacity = 1
     }
     const [elementDragFlag, setElementDragFlag] = useState(null)
     const [flagBoard, setFlagBoard] = useState(null)
@@ -126,6 +144,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             }
             return
         }
+        
         // Если старый элемент не равен нынешнему
         if (elementDragFlag !== `${index}-${i}`){
             // Если он не начальный, то нам надо убрать у старого элемента стили
@@ -146,7 +165,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             
         }
         
-
+        
         const currentIndex = currentBoard.table.indexOf(currentItem) // Индекс преставляемого элемента
         const dropIndex = board.table.indexOf(item) // Индекс элемента на который наводятся
         setBoards(boards.map(
@@ -172,7 +191,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         
         const container = document.querySelector(".modal")
         // если попал на элемент то нужно снять с борда стиль
-        if (container?.contains(e.target) || e.target.classList.value == "img-item" || e.target.classList.value == "item_2" || e.target.classList.value == "div_margin"  ||  e.target.classList.value == "margin" || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
+        if (container?.contains(e.target) || e.target.classList.value == "img-item"  || e.target.classList.value == "grip_members" || e.target.classList.value == "comment_bottom" || e.target.classList.value === "image_members_" || e.target.classList.value == "item_2" || e.target.classList.value == "div_margin"  ||  e.target.classList.value == "margin" || e.target.classList.value == "main-info" || e.target.classList.value == "hr" || e.target.classList.value == "img-item" || e.target.classList.value == "contentEditable" ||  e.target.classList.value == "clock_date" || e.target.classList.value == "datepicker_date" || e.target.classList.value == "comment_icon" || e.target.classList.value == "clock_datepicker" || e.target.classList.value == "bottom_info_item" || e.target.classList.value == "div_icon_item" || e.target.classList.value == "tags_item" || e.target.classList.value == "" || e.target.className == "text_item" ||  e.target.classList.value == "icon_item" || e.target.className === "item text elementfalse" || e.target.className === "item text elementtrue" || e.target.className == "tags_header" || e.target.className == "span_c_text" || e.target.className == "element_board" ){
             if (flagBoard !== null){
                 document.getElementById(flagBoard).style.height = 0;
                 setFlagBoard(null)
@@ -200,6 +219,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                 // Прописать стили для элементов своего же борда
                 setFlagBoard(`${index}-board`)
                 document.getElementById(`${index}-board-focus`).classList.add("focused")
+                document.getElementById(`${index}-board`).style.height = `${height}px`
                 setFocusedBoard(`${index}-board-focus`)
             }
             // если это другой борд, то нам надо записать элемент и дать ему стили
@@ -232,7 +252,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     const dropHandler = async (e, board, item) => {
         e.preventDefault()
         if (dragMember){
-            if (item.members.filter(member => member.id === dragMember.id).length > 0){
+            if (item?.members?.filter(member => member.id === dragMember.id)?.length > 0){
                 setDragMember(null)
                 return
             }
@@ -387,8 +407,9 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                 })
                 const updatedBoards = boards.map(b => {
                     if (b.id === board.id){
+                        
                         return {
-                            ...b, table: [...b.table, {id: data.id, title: data.title, comment: data.comment, datepicker: data.datepicker, tag: data.tag, investment: data.investment} ]
+                            ...b, table: [...b.table, data ]
                         }   
                     }
                     return b
@@ -498,19 +519,6 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
         setShowYourElement(null);
         setShowYourElementItem(null);
         setElementActive(null)
-    }
-    
-    
-    
-    
-    const dragBoardStart = (e, board) => {
-        if (e.target.className === "board"){
-            setOldBoardChange(board)
-            setMenuBoard([])
-            setDragBoard(true)
-            setNewBoard(false)
-            setNewItems(false)
-        }
     }
     const [oldItemPositionBoard, setOldItemPositionBoard] = useState(null)
     const [newItemPositionBoard, setNewItemPositionBoard] = useState(null)
@@ -711,6 +719,26 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             setDeleteBoardActive(false)
         }
     }
+    const [dragActive, setDragActive] = useState(null)
+    const [heightActive, setHeightActive] = useState(null)
+    const [itemDrag, setItemDrag] = useState(null)
+    const dragStartHendlerEvent = (e, index, i, item) => {
+        setItemDrag(item)
+        setDragActive([index, i])
+        setHeightActive(document.getElementById(`${index}-${i}`).getBoundingClientRect().height)
+    }
+    const dragOverHendlerEvent = (e, index, i, item) => {
+        e.preventDefault();
+        if (itemDrag === item) return
+        // console.log(`${index}-${i}`,`${dragActive[0]}-${dragActive[1]}` )
+
+        // if (`${dragActive[0]}-${dragActive[1]}` !== `${index}-${i}`){
+        //     document.getElementById(`${index}-${i}`).style.transform = 'translateY(' + - heightActive + 'px)';
+        //     setDragActive([index, i])
+        // }
+        
+        e.target.className
+    }
     useEffect(() => {
         const fetchData = async () => {
             const data = await NoteService.getUserInfoBoard(authTokens, id)
@@ -781,202 +809,261 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     
     return (
         <div className='boards_app' style={{ backgroundImage: `url(${backgroundImage})` }} >
-            <CoverItem setDragMember={setDragMember} setUser={setUser} userInfo={userInfo} setStar={setStar} star={star} title={title} user={user} chosenEmoji={chosenEmoji} emojiOpen={emojiOpen} onEmojiClick={onEmojiClick} setEmojiOpen={setEmojiOpen} id={id}  />
-            <div className={`app`}>
-            {boards.sort((a, b) => a.position - b.position).map((board, index) => 
-                <div key={index}  
-                onDragOver={e => dragOverHandlerBoards(e, board, index)} 
-                onDrop={e => dropCard(e, board)} 
-                className='items'>
-                    <Tooltip place={'right'} id={`${index}-tag`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2,  pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
-                    <div className="board" 
-                    onDragStart={e => dragBoardStart(e, board)} 
-                    onDragOver={e => dragOverHandlerItems(e, board)} 
-                    id={`${index}-board-focus`} 
-                    draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive? false : true : false}>
-                        <HeaderItemBoard 
-                            deleteBoardActive={deleteBoardActive}
-                            setDeleteBoardActive={setDeleteBoardActive}
-                            boards={boards}
-                            board={board}
-                            newBoardPosition={newBoardChange}
-                            menuBoard={menuBoard}
-                            index={index}
-                            changeMenuBoard={changeMenuBoard}
-                            addItemInMenu={addItemInMenu}
-                            setChangeMenuBoard={setChangeMenuBoard}
-                            deleteBoard={deleteBoard}
-                            tableRearrangement={tableRearrangement}
-                            menuBoardActive={menuBoardActive}
-                            changeBoard={changeBoards}
-                            setMenuBoard={setMenuBoard}  
-                        />
-                        <div ref={(element) => updateContainerRef(index, element)} className={'elements_board' + (newItems[index]? `true` : `false`)} >
-                            {board.table.sort((a, b) => a.position - b.position).map((item, i)=>
-                            <div key={i} className='element_board'>
-                                {!dragBoard && <>
-                                    <Tooltip place={'bottom'} id={`${index}-${i}`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2,  pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
-                                    <Tooltip place={'bottom'} id={`${i}-${index}`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2, pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
-                                    
-                                </>}
-                                <div 
-                                onDragStart={e => dragStartHendler(e, board, item, index, i)} 
-                                onDragLeave={e => dragLeaveHandler(e, board, item) }
-                                onDragEnd={e => dragEndHendler(e, index, i)} 
-                                onDragOver={e => dragOverHandler(e, board, item, index, i)} 
-                                onDrop={e => dropHandler(e, board, item)}
-                                draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive === `${index}-${i}` ? false : true : false} 
-                                id={`${index}-${i}`}
-                                className={`item text element` + `${tagsOpen}`}
-                                onClick={(e) => {(editHandler(e, index, i));}}
-                                >
-                                    <div className="margin">
-                                        
-                                    </div>
-                                    <div className="div_margin" id={`${index}-${i}-1`}>
-                                        
-                                    </div>
-                                    
-                                    <div className='item_2' style={elementActive === `${index}-${i}`? {zIndex: 2} : null}>
-                                    <ModalDialogBoard isOpen={modalDialog.includes(`${index}-${i}`)} onClose={() => {closeEditHandler(index, i); setChangeMenuBoardPositionItemClose(); setChangeMenuBoardPositionItemInLink(false)}}>
-                                        <InModalDoalogBoard 
-                                        setMembers={setMembers}
-                                        members={members}
-                                        user={user}
-                                        id={id}
-                                        colors={colors}
-                                        tags={tags}
-                                        item={item} 
-                                        boards={boards} 
-                                        board={board} 
-                                        index={index} 
-                                        i={i}
-                                        setChangeMenuBoardPositionItem={setChangeMenuBoardPositionItem}
-                                        changeMenuBoardPositionItemInLink={changeMenuBoardPositionItemInLink}
-                                        changeMenuBoardPositionItem={changeMenuBoardPositionItem} 
-                                        newItemPositionBoard = {newItemPositionBoard}
-                                        setChangeMenuBoardPositionItemClose={setChangeMenuBoardPositionItemClose} 
-                                        itemRearrangement={itemRearrangement} 
-                                        changePositionItem={changePositionItem}
-                                        onDeleteItemInBoard={onDeleteItemInBoard}
-                                        closeEditHandler={closeEditHandler}
-                                        setBoards = {setBoards}
-                                        setTags ={setTags}
-                                        setChangeMenuBoardPositionItemInLink={setChangeMenuBoardPositionItemInLink}
-                                        />
-                                    </ModalDialogBoard>
-                                    <div className='img_div_'>
-                                        {
-                                            item.investment?.map((investment, index) => {  
-                                                return investment.active && 
-                                                <div key={index} >
-                                                    <img draggable={false}  className='img-item' src={`/src/assets/${investment.document?.split("/")[4]}`}></img>     
-                                                    <hr className='hr'/> 
-                                                </div>
-                                                    
-                                            })
-                                        }
-                                    </div>
-                                    
-                                    <div className='main-info'>
-                                        <div onClick={(e) => {handleInsertElement(e, index, i, board, item)}} className='div_icon_item'>
-                                            <AiOutlineEdit className='icon_item'/>
-                                        </div>
-                                        <div className="tags_header">
-                                            {item.tag?.map((tag, j)=>
-                                                <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`Цвет: ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, название: "${tag.text}"`}className="tags_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
-                                                    {tagsOpen && (<span className='span_c_text' style={tag.text ? {color: colors[colors.findIndex(color => color.color_text === tag.color)].text_color}: {opacity: 0}}>{ tag.text ? tag.text : "none" }</span>)}
-                                                    {!tagsOpen && (<span className='span_c_text'>none</span>)}
-                                                </div>
-                                            )}
-                                        </div>
-                                        
-                                        
-                                        <div  className='contentEditable'>{item.title}</div> 
-                                        
-                                        
-                                        {/* <textarea type='text' 
-                                            value={elementActive === `${index}-${i}`? content : item.title} 
-                                            readOnly={elementActive? false : true} 
-                                            onChange={(e) => handleInput(e)} 
-                                            className='contentEditable' 
-                                            ref={(el) => {contentRefs.current[index] = contentRefs.current[index] || []; contentRefs.current[index][i] = el}} 
-                                            style={elementActive? {cursor: "auto"} : {cursor:"pointer"}}>
-                                        </textarea>  */}
-                                        
-                                        
-                                        
-                                        <div className='bottom_info_item'>
-                                            {item.datepicker && 
-                                                <>
-                                                    <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? "Срок карточки истекает не скоро" : getColor(item.datepicker) === "#F87168" ? "Срок действия карточки недавно закончился" : getColor(item.datepicker) === "#5D1F1A" ? "Срок действия карточки давно закончился" : item.datepicker.complete? "Карточка выполнена" : "Срок действия карточки закончится в течении 24 часов"} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
-                                                        {isHovered === `${index}-${i}`? item.datepicker.complete? <AiOutlineCheckSquare className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> : <AiOutlineBorder className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> :  <AiOutlineClockCircle className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/>}
-                                                        <span className={getColor(item.datepicker) === "" ? "datepicker_date_color_text" : `datepicker_date`}>{formatDate(new Date(item.datepicker.date))}</span>
-                                                    </div>
-                                                    
-                                                </>
-                                            }
-                                            {/* {console.log(userInfo)}{console.log(item.members)} */}
-                                            {item?.members?.filter(item => item?.id === userInfo?.id).length > 0 && 
-                                                <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Вы подписаны на эту карточку"} className="comment_bottom">    
-                                                    <AiOutlineEye className='comment_icon' />
-                                                </div>
-                                            }
-                                            {item.comment && <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с описанием"} className="comment_bottom">
-                                                <AiOutlineAlignLeft className='comment_icon'/> 
-                                            </div>}
-                                            {item.investment?.length !== 0 &&
-                                                <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с вложениями"} className="comment_bottom">
-                                                    <AiOutlinePaperClip className='comment_icon'/> 
-                                                    <span className='length'>{item.investment?.length}</span>
-                                                </div>
-                                            }
-
-                                        </div>
-                                        
-                                        <div className="grip_members">
-                                                {item.members?.map((item, index) =>
-                                                    <div className="image_div_" key={index}>
-                                                        <img draggable={false} className='image_members_' src={item.user.avatar}/>
+            <CoverItem setUserInfo={setUserInfo} setChoiceView={setChoiceView} choiceView={choiceView} setDragMember={setDragMember} setUser={setUser} userInfo={userInfo} setStar={setStar} star={star} title={title} user={user} chosenEmoji={chosenEmoji} emojiOpen={emojiOpen} onEmojiClick={onEmojiClick} setEmojiOpen={setEmojiOpen} id={id}  />
+            { choiceView === "Таблица" && 
+                <div className={`app`}>
+                    <div className='table_body'>
+                        <div className='table_body_2'>
+                            <div className='header_info_table'>
+                                <span className='columnheader'></span>
+                                <span className='columnheader'>Карточка</span>
+                                <span className='columnheader'>Список</span>
+                                <span className='columnheader'>Метки</span>
+                                <span className='columnheader'>Участники</span>
+                                <span className='columnheader'>Срок</span>
+                            </div>
+                            <div className='scroll'>
+                            {boards.sort((a, b) => a.position - b.position).map((board, index) => 
+                                <div key={index} className='items_table'>
+                                {
+                                    board.table.sort((a, b) => a.position - b.position).map((item, i)=> 
+                                        <div key={i}
+                                        id = {`${index}-${i}`}
+                                        draggable={true} 
+                                        onDragStart={(e) => {dragStartHendlerEvent(e, index, i, item)}}
+                                        onDragOver={(e) => {dragOverHendlerEvent(e, index, i, item)}}
+                                        className="item_table">
+                                            <span className='next_item_board'><AiOutlineHolder className='icon_table' /></span>
+                                            <span className='next_item_board'>{item.title}</span>
+                                            <span className='next_item_board'>{board.title}</span>
+                                            <span className='next_item_board'>
+                                                {item.tag?.map((tag, j)=>
+                                                    <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`Цвет: ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, название: "${tag.text}"`} className="tag_table_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
+                                                        <span className='span_c_text' style={{color: colors[colors.findIndex(color => color.color_text === tag.color)].text_color}}>{ tag.text }</span>
                                                     </div>
                                                 )}
+                                                <Tooltip place={'bottom'} id={`${index}-tag`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2, pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
+                                            </span>
+                                            <span className='next_item_board'> 
+                                                {item.members?.map((item, index) =>
+                                                    <div className="image_div_" key={index}>
+                                                        <img draggable={false} className='image_members_table' src={item.user.avatar}/>
+                                                    </div>
+                                                )}
+                                            </span>
+                                            <span className='next_item_board'>
+                                                {item.datepicker && 
+                                                        <>
+                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? "Срок карточки истекает не скоро" : getColor(item.datepicker) === "#F87168" ? "Срок действия карточки недавно закончился" : getColor(item.datepicker) === "#5D1F1A" ? "Срок действия карточки давно закончился" : item.datepicker.complete? "Карточка выполнена" : "Срок действия карточки закончится в течении 24 часов"} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
+                                                                {isHovered === `${index}-${i}`? item.datepicker.complete? <AiOutlineCheckSquare className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> : <AiOutlineBorder className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> :  <AiOutlineClockCircle className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/>}
+                                                                <span className={getColor(item.datepicker) === "" ? "datepicker_date_color_text" : `datepicker_date`}>{formatDate(new Date(item.datepicker.date))}</span>
+                                                            </div>
+                                                            
+                                                        </>
+                                                    }
+                                            </span>
                                         </div>
-                                        
-                                        </div>
-                                    </div>
-                                    <div ></div>
+                                    )
+                                }
                                 </div>
-                                
-                            </div>)}
-                            <div className="item_preview_pos" id={`${index}-board`}>
-
+                            )}
                             </div>
-                            <AddNewItemInput 
-                            setNewItems={setNewItems}
-                            index={index}
-                            board={board}
-                            newItems={newItems}
-                            setInputValue={setInputValue}
-                            addNewItem={addNewItem}
-                            deleteItem={deleteItem}
-                            addItem={addItem} />
                         </div>
-                        <AddNewItemInBoard 
-                            index={index}
-                            board={board}
-                            newItems={newItems}
-                            setInputValue={setInputValue}
-                            addNewItem={addNewItem}
-                            deleteItem={deleteItem}
-                            addItem={addItem}
-                        />
-                        
-                        
+
                     </div>
                 </div>
-            )}
-                <AddNewBoard newBoard={newBoard} setNewBoard={setNewBoard} setInputBoardNameValue={setInputBoardNameValue} addBoard={addBoard}/>
-            </div>
+            }
+            { choiceView === "Панель" && 
+                <div className={`app`}>
+                    <div className='table_body'>
+                        <Charts listBoards={listBoards} user={user} boards={boards}/>
+                    </div>
+                </div>
+            }
+            { choiceView === "Доска" &&
+                <div className={`app`}>
+                    {boards.sort((a, b) => a.position - b.position).map((board, index) => 
+                        <div key={index}  
+                        onDragOver={e => dragOverHandlerBoards(e, board, index)} 
+                        onDrop={e => dropCard(e, board)} 
+                        className='items'>
+                            <Tooltip place={'right'} id={`${index}-tag`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2,  pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
+                            <div className="board" 
+                            onDragStart={e => dragBoardStart(e, board, index)} 
+                            onDragOver={e => dragOverHandlerItems(e, board)} 
+                            onDragEnd={e => dragBoardEnd(e, board, index)} 
+                            id={`${index}-board-focus`} 
+                            draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive? false : true : false}>
+                                <HeaderItemBoard 
+                                    deleteBoardActive={deleteBoardActive}
+                                    setDeleteBoardActive={setDeleteBoardActive}
+                                    boards={boards}
+                                    board={board}
+                                    newBoardPosition={newBoardChange}
+                                    menuBoard={menuBoard}
+                                    index={index}
+                                    changeMenuBoard={changeMenuBoard}
+                                    addItemInMenu={addItemInMenu}
+                                    setChangeMenuBoard={setChangeMenuBoard}
+                                    deleteBoard={deleteBoard}
+                                    tableRearrangement={tableRearrangement}
+                                    menuBoardActive={menuBoardActive}
+                                    changeBoard={changeBoards}
+                                    setMenuBoard={setMenuBoard}  
+                                />
+                                <div ref={(element) => updateContainerRef(index, element)} className={'elements_board' + (newItems[index]? `true` : `false`)} >
+                                    {board.table.sort((a, b) => a.position - b.position).map((item, i)=>
+                                    <div key={i} className='element_board'>
+                                        {!dragBoard && <>
+                                            <Tooltip place={'bottom'} id={`${index}-${i}`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2,  pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
+                                            <Tooltip place={'bottom'} id={`${i}-${index}`} style={document.getElementsByTagName("body")[0].classList.contains("dark") ? {fontSize: 11, zIndex: 2, pointerEvents: 0, backgroundColor: "#B6C2CF", color: "#1D2125"} : {fontSize: 11, zIndex: 2,  pointerEvents: 0}}/>
+                                            
+                                        </>}
+                                        <div 
+                                        onDragStart={e => dragStartHendler(e, board, item, index, i)} 
+                                        onDragLeave={e => dragLeaveHandler(e, board, item) }
+                                        onDragEnd={e => dragEndHendler(e, index, i)} 
+                                        onDragOver={e => dragOverHandler(e, board, item, index, i)} 
+                                        onDrop={e => dropHandler(e, board, item)}
+                                        draggable={JSON.stringify(modalDialog)==JSON.stringify([]) ? elementActive === `${index}-${i}` ? false : true : false} 
+                                        id={`${index}-${i}`}
+                                        className={`item text element` + `${tagsOpen}`}
+                                        onClick={(e) => {(editHandler(e, index, i));}}
+                                        >
+                                            <div className="margin">
+                                                
+                                            </div>
+                                            <div className="div_margin" id={`${index}-${i}-1`}>
+                                                
+                                            </div>
+                                            
+                                            <div className='item_2' style={elementActive === `${index}-${i}`? {zIndex: 2} : null}>
+                                            <ModalDialogBoard isOpen={modalDialog.includes(`${index}-${i}`)} onClose={() => {closeEditHandler(index, i); setChangeMenuBoardPositionItemClose(); setChangeMenuBoardPositionItemInLink(false)}}>
+                                                <InModalDoalogBoard 
+                                                setMembers={setMembers}
+                                                members={members}
+                                                user={user}
+                                                id={id}
+                                                colors={colors}
+                                                tags={tags}
+                                                item={item} 
+                                                boards={boards} 
+                                                board={board} 
+                                                index={index} 
+                                                i={i}
+                                                setChangeMenuBoardPositionItem={setChangeMenuBoardPositionItem}
+                                                changeMenuBoardPositionItemInLink={changeMenuBoardPositionItemInLink}
+                                                changeMenuBoardPositionItem={changeMenuBoardPositionItem} 
+                                                newItemPositionBoard = {newItemPositionBoard}
+                                                setChangeMenuBoardPositionItemClose={setChangeMenuBoardPositionItemClose} 
+                                                itemRearrangement={itemRearrangement} 
+                                                changePositionItem={changePositionItem}
+                                                onDeleteItemInBoard={onDeleteItemInBoard}
+                                                closeEditHandler={closeEditHandler}
+                                                setBoards = {setBoards}
+                                                setTags ={setTags}
+                                                setChangeMenuBoardPositionItemInLink={setChangeMenuBoardPositionItemInLink}
+                                                />
+                                            </ModalDialogBoard>
+                                            <div className='img_div_'>
+                                                {
+                                                    item.investment?.map((investment, index) => {  
+                                                        return investment.active && 
+                                                        <div key={index} >
+                                                            <img draggable={false}  className='img-item' src={`/src/assets/${investment.document?.split("/")[4]}`}></img>     
+                                                            <hr className='hr'/> 
+                                                        </div>
+                                                            
+                                                    })
+                                                }
+                                            </div>
+                                            
+                                            <div className='main-info'>
+                                                <div onClick={(e) => {handleInsertElement(e, index, i, board, item)}} className='div_icon_item'>
+                                                    <AiOutlineEdit className='icon_item'/>
+                                                </div>
+                                                <div className="tags_header">
+                                                    {item.tag?.map((tag, j)=>
+                                                        <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`Цвет: ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, название: "${tag.text}"`} className="tags_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
+                                                            {tagsOpen && (<span className='span_c_text' style={tag.text ? {color: colors[colors.findIndex(color => color.color_text === tag.color)].text_color}: {opacity: 0}}>{ tag.text ? tag.text : "none" }</span>)}
+                                                            {!tagsOpen && (<span className='span_c_text'>none</span>)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                
+                                                <div  className='contentEditable'>{item.title}</div>                                          
+                                                <div className='bottom_info_item'>
+                                                    {item.datepicker && 
+                                                        <>
+                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? "Срок карточки истекает не скоро" : getColor(item.datepicker) === "#F87168" ? "Срок действия карточки недавно закончился" : getColor(item.datepicker) === "#5D1F1A" ? "Срок действия карточки давно закончился" : item.datepicker.complete? "Карточка выполнена" : "Срок действия карточки закончится в течении 24 часов"} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
+                                                                {isHovered === `${index}-${i}`? item.datepicker.complete? <AiOutlineCheckSquare className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> : <AiOutlineBorder className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> :  <AiOutlineClockCircle className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/>}
+                                                                <span className={getColor(item.datepicker) === "" ? "datepicker_date_color_text" : `datepicker_date`}>{formatDate(new Date(item.datepicker.date))}</span>
+                                                            </div>
+                                                            
+                                                        </>
+                                                    }
+                                                    {item?.members?.filter(item => item?.id === userInfo?.id).length > 0 && 
+                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Вы подписаны на эту карточку"} className="comment_bottom">    
+                                                            <AiOutlineEye className='comment_icon' />
+                                                        </div>
+                                                    }
+                                                    {item.comment && <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с описанием"} className="comment_bottom">
+                                                        <AiOutlineAlignLeft className='comment_icon'/> 
+                                                    </div>}
+                                                    {item.investment?.length !== 0 &&
+                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с вложениями"} className="comment_bottom">
+                                                            <AiOutlinePaperClip className='comment_icon'/> 
+                                                            <span className='length'>{item.investment?.length}</span>
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                                
+                                                <div className="grip_members">
+                                                        {item.members?.map((item, index) =>
+                                                            <div className="image_div_" key={index}>
+                                                                <img draggable={false} className='image_members_' src={item.user.avatar}/>
+                                                            </div>
+                                                        )}
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                            
+                                    </div>
+                                        
+                                    </div>)}
+                                    <div className="item_preview_pos" id={`${index}-board`}>
+
+                                    </div>
+                                    <AddNewItemInput 
+                                    setNewItems={setNewItems}
+                                    index={index}
+                                    board={board}
+                                    newItems={newItems}
+                                    setInputValue={setInputValue}
+                                    addNewItem={addNewItem}
+                                    deleteItem={deleteItem}
+                                    addItem={addItem} />
+                                </div>
+                                <AddNewItemInBoard 
+                                    index={index}
+                                    board={board}
+                                    newItems={newItems}
+                                    setInputValue={setInputValue}
+                                    addNewItem={addNewItem}
+                                    deleteItem={deleteItem}
+                                    addItem={addItem}
+                                />
+                                
+                                
+                            </div>
+                        </div>
+                    )}
+                        <AddNewBoard newBoard={newBoard} setNewBoard={setNewBoard} setInputBoardNameValue={setInputBoardNameValue} addBoard={addBoard}/>
+                </div>
+            }
             {showYourElement && (
                 <>
                 <div style={{ position: 'absolute', left: elementPosition.x, top: elementPosition.y, zIndex: 2}} ref={modalRef}>

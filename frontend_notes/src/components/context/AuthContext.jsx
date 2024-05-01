@@ -12,7 +12,6 @@ export default AuthContext
 
 
 export const AuthProvider = ({children}) => {
-    
     if (!localStorage.getItem('language')){
         localStorage.setItem('language', "Русский")
     }
@@ -25,7 +24,7 @@ export const AuthProvider = ({children}) => {
     }
     const [ authTokens, setAuthTokens ] = useState(()=> localStorage.getItem('authTokens') ?  JSON.parse(localStorage.getItem('authTokens')) : null)
     const [loading, setLoading] = useState(true)
-    
+    const [listPages, setListPages] = useState(null)
     const history = useNavigate()
 
     let activateCheckEmail = async (email) => {
@@ -211,6 +210,7 @@ export const AuthProvider = ({children}) => {
         setFavoritePages:setFavoritePages,
         setUserInfo:setUserInfo,
         userInfo:userInfo,
+        listPages:listPages, setListPages:setListPages
     }
 
     useEffect(() => {
@@ -219,10 +219,8 @@ export const AuthProvider = ({children}) => {
             updateToken()
         }
         const fetchData = async () => {
-            const data = await NoteService.getFavoritesBoards(authTokens)
-            const data2 = await NoteService.getUserInfo(authTokens)
-            setUserInfo(data2)
-            setFavoritePages(data.boards_like)
+            const data = await NoteService.getUserInfo(authTokens)
+            setUserInfo(data)
         }
         fetchData()
         

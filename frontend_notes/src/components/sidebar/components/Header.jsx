@@ -36,9 +36,8 @@ const Header = ({ toggleNavbar, mainText, additionalText, switchNav, switchNavba
     }
   }
   function handleClickOutside2(event) {
-    const container = document.querySelector(`.${styles.marketing_hub_container1}`);
     const container2 = document.querySelector(`.${styles.img}`);
-    if (!container.contains(event.target) && !container2.contains(event.target)) {
+    if (!container2.contains(event.target)) {
       setSwitchDropItem2(styles.close2);
     }
     
@@ -86,38 +85,21 @@ const Header = ({ toggleNavbar, mainText, additionalText, switchNav, switchNavba
                 <AiOutlineEllipsis onClick={switchDrop2} className={styles.img}/>
               </div>
             </div>
-            <div className={styles.marketing_hub_container1}>
-              {/* second dropitem */}
-              <ul className={styles.ul_dropitem}>
-                <li className={styles.li_dropitem}>
-                  <Link className={styles.link} to={'/settings'}>
+            {/* first dropitem */}
+            <ul className={styles.ul_dropitem}>
+              
+              <li className={styles.li_dropitem}>
+                <Link className={styles.link} to={'/settings'}>
                     <AiOutlineSetting className={styles.icon}/>
                     <span className={`${styles.text_dropitem} `}>Settings</span>
-                  </Link>
-                </li>
-                <li className={styles.li_dropitem}>
-                  <Link className={styles.link} onClick={logoutUser}>
+                </Link>
+              </li>
+              <li className={styles.li_dropitem}>
+                <Link className={styles.link} onClick={logoutUser}>
                       <AiOutlineLogout className={styles.icon}/>
                       <span className={`${styles.text_dropitem} `}>Logout</span>
                   </Link>
-                </li>
-              </ul>
-            </div>
-            {/* first dropitem */}
-            <ul className={styles.ul_dropitem}>
-              <li className={styles.li_dropitem}>
-                <Link className={styles.link}>
-                  <AiOutlinePlusCircle className={styles.icon}/>
-                  <span className={`${styles.text_dropitem}`}>Add new members</span>
-                </Link>
               </li>
-              <li className={styles.li_dropitem}>
-                <Link className={styles.link}>
-                    <AiOutlineTeam className={styles.icon}/>
-                    <span className={`${styles.text_dropitem} ${styles.nav_text}`}>Join or create workspace</span>
-                </Link>
-              </li>
-              
               <li className={styles.mode}>
                   <div className={styles.moon_sun}>
                       <BsFillMoonStarsFill  className={`${styles.icon} ${styles.moon}`}/>

@@ -39,9 +39,10 @@ class InvestmentSerializer(ModelSerializer):
         fields = ['id', 'document', 'extension', 'site', 'active', 'timestamp']
 
 class UserSerializerEmail(ModelSerializer):
+    user = UserProfileSerializer(many=False)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'user']
 
 class UserSerializer(ModelSerializer):
     user = UserProfileSerializer(many=False)
