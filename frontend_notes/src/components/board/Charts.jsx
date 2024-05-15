@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Line, Bar, Pie  } from "react-chartjs-2";
 import Chart from 'chart.js/auto';
+import AuthContext from '../context/AuthContext';
+import { en_language, ru_language } from '../../services/language';
 const Charts = ({ listBoards, boards, user }) => {
+    let {authTokens, setFavoritePages, language} = useContext(AuthContext)
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
+    useEffect(() => {
+        setLang(language === "Русский" ? ru_language : en_language);
+    }, [language]) 
     let countNull = 0;
     let countComplete = 0;
     let countTimeExpired = 0;
@@ -10,27 +17,27 @@ const Charts = ({ listBoards, boards, user }) => {
     let countTimeNotSoon = 0;
     const getDate = (datepicker) => {
         if (!datepicker) return
-        if (datepicker.complete) return "Выполнено" // Зеленный
+        if (datepicker.complete) return lang.done // Зеленный
         const now = new Date().getTime()
         const end = new Date(datepicker.date).getTime()
         const timeDiff = end - now
         if (timeDiff < 0 && timeDiff > -86400 * 1000) {
-            return "Просрочен"
+            return lang.expired
         }
         if (timeDiff < -86400 * 1000) {
-            return "Просрочен" // Красный
+            return lang.expired// Красный
         }
         if (timeDiff < 86400 * 1000 && timeDiff > 0) {
-            return "Срок истекает" // Желтый
+            return lang.deadline_expire // Желтый
         } 
-        return "Истекает не скоро"
+        return lang.deadline_not_soon
     }
     boards.forEach(board => {
         countNull += board.table.filter(item => item.datepicker === null).length;
-        countComplete += board.table.filter(item => getDate(item.datepicker) === "Выполнено").length
-        countTimeExpired += board.table.filter(item => getDate(item.datepicker) === "Просрочен").length
-        countTimeSoon += board.table.filter(item => getDate(item.datepicker) === "Срок истекает").length
-        countTimeNotSoon += board.table.filter(item => getDate(item.datepicker) === "Истекает не скоро").length
+        countComplete += board.table.filter(item => getDate(item.datepicker) === lang.done).length
+        countTimeExpired += board.table.filter(item => getDate(item.datepicker) === lang.expired).length
+        countTimeSoon += board.table.filter(item => getDate(item.datepicker) === lang.deadline_expire).length
+        countTimeNotSoon += board.table.filter(item => getDate(item.datepicker) === lang.deadline_not_soon).length
     });
     const userCounts = {};
     user.forEach(u => {
@@ -55,7 +62,7 @@ const Charts = ({ listBoards, boards, user }) => {
         datasets: [
           {
             data: boards.map(board => board.table.length),
-            label: "Карточек",
+            label: lang.сards,
             borderColor: "#3333ff",
             backgroundColor: "#9FADBC",
             fill: true
@@ -64,11 +71,11 @@ const Charts = ({ listBoards, boards, user }) => {
         ]
       };
     const barChartData2 = {
-        labels: ["Выполнено", 'Истекает не скоро', 'Срок истекает', 'Просрочен', 'Без срока'],
+        labels: [lang.done, lang.deadline_not_soon, lang.deadline_expire, lang.expired, lang.no_dedline],
         datasets: [
             {
             data: [countComplete, countTimeNotSoon, countTimeSoon, countTimeExpired, countNull],
-            label: "Карточек",
+            label: lang.сards,
             borderColor: "#3333ff",
             backgroundColor: "#9FADBC",
             fill: true
@@ -80,7 +87,7 @@ const Charts = ({ listBoards, boards, user }) => {
         datasets: [
             {
             data: userItemCountsValue,
-            label: "Карточек",
+            label: lang.сards,
             borderColor: "#3333ff",
             backgroundColor: "#9FADBC",
             fill: true
@@ -92,7 +99,7 @@ const Charts = ({ listBoards, boards, user }) => {
         datasets: [
             {
             data: tagItemCountsValue,
-            label: "Карточек",
+            label: lang.сards,
             borderColor: "#3333ff",
             backgroundColor: "#9FADBC",
             fill: true
@@ -103,7 +110,7 @@ const Charts = ({ listBoards, boards, user }) => {
     <div className='tables_static'>
         <div className='static_table'>
             <span className='span_bar'>
-                Карточки по колонкам
+                {lang.cards_table}
             </span>
             <div className='static_table_bar'>
                 <Bar
@@ -116,7 +123,7 @@ const Charts = ({ listBoards, boards, user }) => {
         </div>
         <div className='static_table'>
             <span className='span_bar'>
-                Карточки по дате выполнения
+                {lang.cards_dedline}
             </span>
             <div className='static_table_bar'>
                 <Bar
@@ -128,7 +135,7 @@ const Charts = ({ listBoards, boards, user }) => {
         </div>
         <div className='static_table'>
         <span className='span_bar'>
-                Карточки по участникам
+                {lang.cards_members}
             </span>
             <div className='static_table_bar'>
                 <Bar
@@ -140,7 +147,7 @@ const Charts = ({ listBoards, boards, user }) => {
         </div>
         <div className='static_table'>
             <span className='span_bar'>
-                Карточки по меткам
+                {lang.cards_tags}
             </span>
             <div className='static_table_bar'>
                 <Bar

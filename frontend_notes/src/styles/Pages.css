@@ -1863,11 +1863,9 @@ body.dark .boards_app{
     /* Убираем фиксированную высоту */
     height: auto;
     background: var(--table-color);
-    width: 4%; 
+    width: 20%;
 }
-.columnheader:nth-child(n+2) {
-    width: 20%; /* Примерная ширина для остальных столбцов */
-}
+
 .item_table{
     margin: 0 15px 0 15px;
     overflow: hidden;
@@ -1896,11 +1894,9 @@ body.dark .boards_app{
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    width: 4%; /* Ширина блока */
+    width: 20%; /* Ширина блока */
 }
-.next_item_board:nth-child(n+2) {
-    width: 20%; /* Примерная ширина для остальных столбцов */
-}
+
 .icon_table{
     cursor: grab;
     opacity: 0;

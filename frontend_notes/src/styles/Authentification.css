@@ -27,6 +27,13 @@ html,body{
   font-size: 12px;
   color: var(--text-color);
 }
+.text_dropitem2{
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  transition: var(--tran-02);
+  white-space: nowrap;
+}
 .language_button{
   width: 85px;
   display: flex;
@@ -39,7 +46,7 @@ html,body{
   right: 50px;
   top: 35px;
   min-width: 200px;
-  background: var(--sidebar-color);
+  background: #FFF;
   border-radius: 6px;
   z-index: 20;
   box-shadow: 0px 8px 12px #091E4226, 0px 0px 1px #091E424F;
@@ -63,7 +70,7 @@ html,body{
   transition: var(--tran-04);
 }
 .link_language:hover{
-  background: var(--primary-color);
+  background: #d3d3d3;
 }
 .auth{
   position: absolute;

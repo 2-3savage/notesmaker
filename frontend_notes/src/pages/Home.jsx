@@ -6,10 +6,11 @@ import { NoteService } from '../services/note.service';
 import { AiFillStar, AiOutlineUser, AiOutlineTeam, AiOutlineProject, AiOutlineStar, AiOutlineEllipsis, AiFillPlusCircle } from "react-icons/ai";
 import '../styles/pages.css'
 import NewBoard from '../components/pages/NewBoard';
+import { en_language, ru_language } from '../services/language';
 const Home = () => {
-  let {setListPages, listPages, logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
-  let user = localStorage.getItem('authTokens') ?  jwtDecode(localStorage.getItem('authTokens')) : null
-  
+  let {language, setListPages, listPages, logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
+  const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
+
   const [modalInfoIsOpen, setModalInfoIsOpen] = useState(false) // modal dialog
   const handleStar = async (boardId) => {
     const data = await NoteService.removeBoardFavorite(boardId, userInfo.id)
@@ -35,33 +36,19 @@ const Home = () => {
     setModalInfoIsOpen(false);
   }
   useEffect(() => {
-      const fetchData = async () => {
-          const data = await NoteService.getFavoritesBoards(authTokens)
-          const data2 = await NoteService.getUserInfo(authTokens)
-          if (data === -1){
-            logoutUser()
-          }else if (data === 0){
-            setListPages(null)
-          }
-          else{
-            setListPages(data.boards_not_like)
-            setFavoritePages(data.boards_like)
-            setUserInfo(data2)
-          }
-      }
-      if (modalInfoIsOpen) document.addEventListener("mousedown", handleClickOutsideInCreatePage)
-      fetchData()
+    setLang(language === "Русский" ? ru_language : en_language);
+    if (modalInfoIsOpen) document.addEventListener("mousedown", handleClickOutsideInCreatePage)
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideInCreatePage)
     }
-  }, [modalInfoIsOpen])
+  }, [modalInfoIsOpen, language])
   return (
   <div className='home'>
     <div className='boards'>
       {listFavoritePages?.length !== 0 && 
       <div className='boards-header'>
         <AiOutlineStar className='icons_header' /> 
-        <span className='text_header'>Отмеченные доски</span>
+        <span className='text_header'>{lang.marked_boards}</span>
       </div>
       }
       <div className='boards-list'>
@@ -91,7 +78,7 @@ const Home = () => {
     <div className='boards'>
       <div className='boards-header'>
         <AiOutlineProject className='icons_header' />
-        <span className='text_header'>Остальные таблицы</span>
+        <span className='text_header'>{lang.last_boards}</span>
       </div>
       <div className='boards-list'>
         {listPages?.map((item, index) => 
@@ -117,7 +104,7 @@ const Home = () => {
         )}
         <div onClick={() => {modalInfoIsOpen ? null : setModalInfoIsOpen(true)}} className="boards_link-new-page" style={{}}>
             <div className='board-details-new-page'>
-              Создать доску
+              {lang.create_board}
             </div>
             <div className='board-add-'>
               {modalInfoIsOpen && <NewBoard handleClose={handleClose} userInfo={userInfo}/>}

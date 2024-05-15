@@ -5,10 +5,15 @@ import { theme } from './theme';
 import { AiOutlineCheck,  AiOutlineClose, AiOutlineUsergroupAdd } from "react-icons/ai";
 import AuthContext from '../context/AuthContext';
 import { NoteService } from '../../services/note.service';
+import { en_language, ru_language } from '../../services/language';
 
 const NewPage = ({userInfo, setModalInfoIsOpen}) => {
   
-    let {history, authTokens} = useContext(AuthContext)
+    let {history, authTokens, language} = useContext(AuthContext)
+    useEffect(() =>{
+      setLang(language === "Русский" ? ru_language : en_language);
+    }, [language])
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
     const [chooseTheme, setChooseTheme] = useState(theme[0])
     const [chooseThemeIndex, setChooseThemeIndex] = useState(0)
     const [input, setInput] = useState(null)
@@ -26,11 +31,12 @@ const NewPage = ({userInfo, setModalInfoIsOpen}) => {
         await history(`/pages/${data_create.id}/`)
         setInput(null)
       }
+      
   return (
     <div id="create_page" className={styles.create_page_open}>
           
           <div className={styles.div_dropitem_modal}>
-            <span className={styles.text_dropitem_modal}>Создать доску</span>
+            <span className={styles.text_dropitem_modal}>{lang.create_board}</span>
           </div>
           
           <div className={styles.tags_div}>
@@ -45,7 +51,7 @@ const NewPage = ({userInfo, setModalInfoIsOpen}) => {
             </div>
             
             <div>
-              <label  className={styles.label}>Фон</label>
+              <label  className={styles.label}>{lang.background}</label>
               <div>
                 <ul className={styles.colors}>
                   {theme.map((item, index) => 
@@ -59,16 +65,16 @@ const NewPage = ({userInfo, setModalInfoIsOpen}) => {
                   )}
                 </ul>
               </div>
-              <label className={styles.label}>Заголовок доски</label>
+              <label className={styles.label}>{lang.header_board}</label>
               <input onChange={handleChangeInput} className={styles.input_new_page}></input>
               {!input && 
                 <div className={styles.div_input}>
                   <span>👋</span>
-                  <span className={styles.text_input}> Укажите название доски.</span>
+                  <span className={styles.text_input}> {lang.board_name}</span>
                 </div>
               }
               <Link onClick={() => handleTableCreate()} className={styles.btn_create}>
-                <span>Создать</span>
+                <span>{lang.create}</span>
               </Link>
               <div className={styles.icon_close_div} onClick={() => {setModalInfoIsOpen(false)}}>
                 <AiOutlineClose className={styles.icon_close}/>

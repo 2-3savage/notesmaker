@@ -14,6 +14,7 @@ import Activate from './pages/Activate';
 import ResetPassword from './pages/ResetPassword';
 import ResetEmail from './pages/ResetEmail';
 import RouteRegister from './components/utils/RouteRegister';
+import StartPage from './pages/StartPage';
 
 function App() {
   return (
@@ -24,13 +25,14 @@ function App() {
             <Routes>
               <Route path='/activate/:uid/:token' element={<Activate />}/>
               <Route element={<RouteRegister />}>
+                <Route path="/" element={<StartPage />} />
                 <Route path='/reset/:uid/:token' element={<ResetPassword />} />
                 <Route path='/reset_password' element={<ResetEmail />} />
                 <Route path="/login" element={<Authentification />} />
                 <Route path='/registration' element={<Registration />} />
               </Route>
               <Route element={<PrivateRoute />}>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/home" element={<Home />} />
                   <Route path="/notes" element={<NotesListPage />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/calendar" element={<Calendar />} />

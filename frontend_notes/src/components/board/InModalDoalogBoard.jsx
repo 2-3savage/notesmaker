@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useContext } from 'react'
 import { Tooltip } from 'react-tooltip';
 import "react-widgets/styles.css";
 import { Link } from 'react-router-dom'
@@ -10,6 +10,8 @@ import moment from 'moment';
 import { NoteService } from '../../services/note.service';
 import Investment from './Investment';
 import Members from './Members';
+import { en_language, ru_language } from '../../services/language';
+import AuthContext from '../context/AuthContext';
 
 const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, boards, board, index, i, changeMenuBoardPositionItemInLink, changeMenuBoardPositionItem,setChangeMenuBoardPositionItem, newItemPositionBoard, setChangeMenuBoardPositionItemClose, itemRearrangement, changePositionItem, setTags, onDeleteItemInBoard, closeEditHandler, setChangeMenuBoardPositionItemInLink, setBoards}) => {
     const [datePicker, setDatePicker] = useState(null)
@@ -27,6 +29,8 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
     const [isOpen, setIsOpen] = useState(false);
     const [deleteItemActive, setDeleteItemActive] = useState(false)
     const [investment, setInvestment] = useState(false)
+    let {authTokens, setFavoritePages, language} = useContext(AuthContext)
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
     const handleDeleteFile = async (investment) => {
         const data = await NoteService.deleteInvestment(id, investment.id)
         setBoards(data.items)
@@ -191,18 +195,18 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
     }
     
     useEffect(() => {
+        setLang(language === "Русский" ? ru_language : en_language);
         if (datePicker) document.addEventListener("mousedown", closeOpenMenu)
         if (newTagOpenInTag || newInTag || tagEditInTag) document.addEventListener("mousedown", closeOpenTagInTag)
         if (tagOpen || newTagOpen || tagEdit) document.addEventListener("mousedown", closeOpenTag)
         if (deleteItemActive) document.addEventListener("mousedown", handleCloseDeleteItem)
-        
         return () => {
             document.removeEventListener("mousedown", closeOpenTag)
             document.removeEventListener("mousedown", closeOpenTagInTag)
             document.removeEventListener("mousedown", closeOpenMenu)   
             document.removeEventListener("mousedown", handleCloseDeleteItem)
         }
-    }, [datePicker, deleteItemActive, newTagOpenInTag, newInTag, tagEditInTag, tagOpen, newTagOpen, tagEdit])
+    }, [language, datePicker, deleteItemActive, newTagOpenInTag, newInTag, tagEditInTag, tagOpen, newTagOpen, tagEdit])
   return (
     <>
         <div className='header_div_modal_dialog'>
@@ -210,7 +214,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
             <span className='header_text_modal_dialog'>{item.title}</span>
         </div>
         
-        <span className='board_position_item_modal_dialog'>в колонке <Link draggable={false} onClick={() => setChangeMenuBoardPositionItemInLink(!changeMenuBoardPositionItemInLink)} className='button_link_board_modal_dialog'>{board.title}</Link></span>
+        <span className='board_position_item_modal_dialog'>{lang.in_list}<Link draggable={false} onClick={() => setChangeMenuBoardPositionItemInLink(!changeMenuBoardPositionItemInLink)} className='button_link_board_modal_dialog'>{board.title}</Link></span>
         {changeMenuBoardPositionItemInLink && 
             <ChangePositionItem 
             itemRearrangement={itemRearrangement}
@@ -225,7 +229,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
             />
         }
         <div className='tags_modal'>
-            <span className='tags_header_name'>Метки</span>
+            <span className='tags_header_name'>{lang.tag}</span>
             <div className='tags_modal_dialog'>
                 {item.tag?.map((tag, j)=>
                 <div key={j} onClick={() => {setNewTagOpen(false);setTagEdit(null); setTagOpen(false); setNewTagOpenInTag(!newTagOpenInTag)}}  className='tags_item_modal_dialog' style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
@@ -237,7 +241,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 {newTagOpenInTag && !newInTag && !tagEditInTag && 
                     <div className='tag_open' style={{zIndex: 1}}>
                         <div className='div_dropitem_modal'>
-                        <span className='text_dropitem_modal'>Метки</span>
+                        <span className='text_dropitem_modal'>{lang.tag}</span>
                         </div>
                         <div className='tags_div'>
                             {tags.map((tag, j) => 
@@ -253,7 +257,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                                 )
                             }
                         </div>
-                        <Link className='btn_new_tag' onClick={() => setNewInTag(!newInTag)}><span className='text'>Создать новую метку</span></Link>
+                        <Link className='btn_new_tag' onClick={() => setNewInTag(!newInTag)}><span className='text'>{lang.add_new_tag}</span></Link>
                         <Link onClick={() => setNewTagOpenInTag(false)} className='icon_close_div'>
                             <AiOutlineClose className='icon_close'></AiOutlineClose>
                         </Link>   
@@ -262,14 +266,14 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 {tagEditInTag && 
                     <div className='tag_open' style={{top: 0, zIndex: 1}}>
                          <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Ректирование метки</span>
+                            <span className='text_dropitem_modal'>{lang.editing_tag}</span>
                         </div>
                         <div className='div_preview'>
                         <div className="div_tag_preview" style={{background: tagColorEdit?.color}}>
                             {textEdit? <span style={{color: tagColorEdit?.text_color}} className='text_preview'>{textEdit}</span> : <span style={{opacity: 0}}>none</span>}
                         </div>
                         </div>
-                        <input type='text' onChange={(e) => setTextEdit(e.target.value)} placeholder='Название метки' className='input_tag'></input>
+                        <input type='text' onChange={(e) => setTextEdit(e.target.value)} placeholder={lang.name_tag} className='input_tag'></input>
                         <div className='tag_choose'>
                             {colors.map((color, j) => 
                                 <div key={j}> 
@@ -282,8 +286,8 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                             }
                         </div>
                         <div className='buttons_tag'>
-                            <Link onClick={() => {editTag(tagEditInTag), setTagEditInTag(null); setTagColorEdit(null); setTextEdit(null)}} className='save_tag'>Сохранить</Link>
-                            <Link onClick={() => {deleteTag(tagEditInTag), setTagEditInTag(null); setTagColorEdit(null); setTextEdit(null)}} className='delete_tag'>Удалить</Link>
+                            <Link onClick={() => {editTag(tagEditInTag), setTagEditInTag(null); setTagColorEdit(null); setTextEdit(null)}} className='save_tag'>{lang.save}</Link>
+                            <Link onClick={() => {deleteTag(tagEditInTag), setTagEditInTag(null); setTagColorEdit(null); setTextEdit(null)}} className='delete_tag'>{lang.delete}</Link>
                         </div>
 
 
@@ -298,7 +302,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 {newInTag &&
                     <div className='tag_open' style={{top: 0, zIndex: 1}}>
                          <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Создание метки</span>
+                            <span className='text_dropitem_modal'>{lang.creature_tag}</span>
                         </div>
                         <div className='div_preview'>
                         {(newTag || textTag) &&
@@ -307,7 +311,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                             </div>
                         }
                         </div>
-                        <input type='text' onChange={(e) => setTextTag(e.target.value)} placeholder='Название метки' className='input_tag'></input>
+                        <input type='text' onChange={(e) => setTextTag(e.target.value)} placeholder={lang.name_tag} className='input_tag'></input>
                         <div className='tag_choose'>
                             {colors.map((color, j) => 
                                 <div key={j}> 
@@ -319,7 +323,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                                 )
                             }
                         </div>
-                        <Link onClick={() => {saveTag(); setNewInTag(false); setTextTag(null)}} className='save_tag'>Сохранить</Link>
+                        <Link onClick={() => {saveTag(); setNewInTag(false); setTextTag(null)}} className='save_tag'>{lang.save}</Link>
                         <Link onClick={() => {setNewInTag(false); setNewTagOpenInTag(false); setNewTag({ color_text: "green_muted", color: "#164B35", text_color: "#BAF3DB", text: "приглушенный зеленый" })}} className='icon_close_div'>
                             <AiOutlineClose className='icon_close'></AiOutlineClose>
                         </Link> 
@@ -334,7 +338,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
         {item.investment?.length !== 0 && 
             <div className='textarea_div_modal_dialog'>
                 <AiOutlinePaperClip className='header_icon_modal_dialog' />
-                <span className='text_textarea'>Вложения</span>
+                <span className='text_textarea'>{lang.attachments}</span>
             </div>
         }
         <div draggable={false} className='file_div'>
@@ -350,10 +354,10 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                         <span className='name_file'>{investment?.extension === "site" ? investment?.site : investment?.document?.split("/")[4]}</span>
                         <span className='time_file'>{getFormattedTime(investment?.timestamp)}</span>
                         <div className='elements_management'>
-                            {investment?.extension !== "site" ? <Link draggable={false} target="_blank" rel="noreferrer" to={`/src/assets/${investment?.document?.split("/")[4]}`} download={investment?.document?.split("/")[4]} className='link_file'><AiOutlineDownload className='icon_file'/>Загрузить</Link> : <Link draggable={false} target='_blank' to={`${investment.site}`} className='link_file'><AiOutlineGlobal className='icon_file'/>Посетить сайт</Link>}
-                            <Link draggable={false} onClick={() => handleDeleteFile(investment)} className='link_file'><AiOutlineDelete className='icon_file' />Удалить</Link>
+                            {investment?.extension !== "site" ? <Link draggable={false} target="_blank" rel="noreferrer" to={`/src/assets/${investment?.document?.split("/")[4]}`} download={investment?.document?.split("/")[4]} className='link_file'><AiOutlineDownload className='icon_file'/>{lang.download}</Link> : <Link draggable={false} target='_blank' to={`${investment.site}`} className='link_file'><AiOutlineGlobal className='icon_file'/>{lang.site}</Link>}
+                            <Link draggable={false} onClick={() => handleDeleteFile(investment)} className='link_file'><AiOutlineDelete className='icon_file' />{lang.delete}</Link>
                             {!investment?.active && (investment?.extension === ".svg" || investment?.extension === ".jpg" || investment?.extension === ".png" || investment?.extension === ".gif") && <Link onClick={() => updateInvestmentCover(investment, true)} draggable={false} className='link_file'><AiOutlineCheckCircle className='icon_file'/>Сделать обложкой</Link> }
-                            {investment?.active && <Link draggable={false} onClick={() => updateInvestmentCover(investment, false) } className='link_file'><AiOutlineCloseCircle className='icon_file'/>Убрать обложку</Link> }
+                            {investment?.active && <Link draggable={false} onClick={() => updateInvestmentCover(investment, false) } className='link_file'><AiOutlineCloseCircle className='icon_file'/>{lang.remove_cover}</Link> }
                         </div>
                     </div>
                     
@@ -363,16 +367,16 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
         </div>
         <div className='textarea_div_modal_dialog'>
             <AiOutlineAlignLeft className='header_icon_modal_dialog' />
-            <span className='text_textarea'>Описание</span>
+            <span className='text_textarea'>{lang.description}</span>
         </div>
-        <textarea value={textarea} onChange={handleTextChange} onBlur={() => saveTextarea()} type='text' placeholder='Добавьте более подробное описаниe...' className='textarea_modal_dialog'></textarea>
+        <textarea value={textarea} onChange={handleTextChange} onBlur={() => saveTextarea()} type='text' placeholder={lang.add_description} className='textarea_modal_dialog'></textarea>
         <div className='right_div_modal_dialog'>
             <ul >
-                <span className='header_right_menu'>Добавить на карточку</span>
+                <span className='header_right_menu'>{lang.add_in_card_member}</span>
                 <li className='li_right_menu'>
                     <Link draggable={false} onClick={() => setMembers(true)} className="link_right_menu">
                         <AiOutlineTeam className="icon_link_right_menu"/>
-                        <span className="text">Участники</span>
+                        <span className="text">{lang.member}</span>
                     </Link>
                 </li>
                 {
@@ -383,14 +387,14 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 <li className='li_right_menu'>
                     <Link draggable={false} onClick={() => {setNewInTag(false);setTagEditInTag(null); setTagOpen(!tagOpen);setNewTagOpenInTag(false)}} className="link_right_menu">
                         <AiOutlineTag className="icon_link_right_menu"/>
-                        <span className="text">Метки</span>
+                        <span className="text">{lang.tag}</span>
                     </Link>
                 </li>
                 
                 {tagOpen && !newTagOpen && !tagEdit && 
                     <div className='tag_open'>
                          <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Метки</span>
+                            <span className='text_dropitem_modal'>{lang.tag}</span>
                         </div>
                         <div className='tags_div'>
                             {tags.map((tag, j) => 
@@ -416,16 +420,16 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 {tagEdit && 
                     <div className='tag_open' style={{top: 0}}>
                          <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Ректирование метки</span>
+                            <span className='text_dropitem_modal'>{lang.editing_tag}</span>
                         </div>
                         <div className='div_preview'>
                         <div className="div_tag_preview" style={{background: tagColorEdit?.color}}>
                             {textEdit? <span style={{color: tagColorEdit?.text_color}} className='text_preview'>{textEdit}</span> : <span style={{opacity: 0}}>none</span>}
                         </div>
                         </div>
-                        <span style={{marginLeft: 2}}>Название:</span>
-                        <input type='text' onChange={(e) => setTextEdit(e.target.value)} defaultValue={textEdit} placeholder='Название метки' className='input_tag'></input>
-                        <span style={{marginLeft: 2}}>Цвет:</span>
+                        <span style={{marginLeft: 2}}>{lang.name_tag_dot}</span>
+                        <input type='text' onChange={(e) => setTextEdit(e.target.value)} defaultValue={textEdit} placeholder={lang.name_tag} className='input_tag'></input>
+                        <span style={{marginLeft: 2}}>{lang.color_tag_}</span>
                         <div className='tag_choose'>
                             {colors.map((color, j) => 
                                 <div key={j}> 
@@ -453,7 +457,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 {newTagOpen &&
                     <div className='tag_open' style={{top: 0}}>
                          <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Создание метки</span>
+                            <span className='text_dropitem_modal'>{lang.creature_tag}</span>
                         </div>
                         <div className='div_preview'>
                         {(newTag || textTag) &&
@@ -462,9 +466,9 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                             </div>
                         }
                         </div>
-                        <span style={{marginLeft: 2}}>Название:</span>
-                        <input type='text' onChange={(e) => setTextTag(e.target.value)} placeholder='Название метки' className='input_tag'></input>
-                        <span style={{marginLeft: 2}}>Цвет:</span>
+                        <span style={{marginLeft: 2}}>{lang.name_tag_dot}</span>
+                        <input type='text' onChange={(e) => setTextTag(e.target.value)} placeholder={lang.name_tag} className='input_tag'></input>
+                        <span style={{marginLeft: 2}}>{lang.color_tag_}</span>
                         <div className='tag_choose'>
                             {colors.map((color, j) => 
                                 <div key={j}> 
@@ -476,7 +480,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                                 )
                             }
                         </div>
-                        <Link onClick={() => {saveTag(); setNewTagOpen(false); setTextTag(null)}} className='save_tag'>Сохранить</Link>
+                        <Link onClick={() => {saveTag(); setNewTagOpen(false); setTextTag(null)}} className='save_tag'>{lang.save}</Link>
                         <Link onClick={() => {setNewTagOpen(false); setTagOpen(false); setNewTag({ color_text: "green_muted", color: "#164B35", text_color: "#BAF3DB", text: "приглушенный зеленый" })}} className='icon_close_div'>
                             <AiOutlineClose className='icon_close'></AiOutlineClose>
                         </Link> 
@@ -489,7 +493,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 <li className='li_right_menu'>
                     <Link draggable={false} onClick={() => {datePicker? setDatePicker(false) : setDatePicker(true)}}  className="link_right_menu">
                         <AiOutlineClockCircle className="icon_link_right_menu"/>
-                        <span className="text">Дату</span>
+                        <span className="text">{lang.date}</span>
                     </Link>
                 </li>
                 <ClockDatePicker 
@@ -505,15 +509,15 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 <li className='li_right_menu'>
                     <Link draggable={false} onClick={investment? () => setInvestment(false) : () => setInvestment(true)} className="link_right_menu">
                         <AiOutlinePaperClip  className="icon_link_right_menu"/>
-                        <span className="text">Вложения</span>
+                        <span className="text">{lang.attachments}</span>
                     </Link>
                 </li>
                 <Investment  boards={boards} board={board} setBoards={setBoards} item={item} setInvestment={setInvestment} investment={investment} />
-                <span className='header_right_menu'>Действия</span>
+                <span className='header_right_menu'>{lang.actions}</span>
                 <li className='li_right_menu'>
                     <Link draggable={false} onClick={() => {changeMenuBoardPositionItem ? setChangeMenuBoardPositionItemClose() : setChangeMenuBoardPositionItem(true)}} className="link_right_menu">
                         <AiOutlineArrowRight className="icon_link_right_menu"/>
-                        <span className="text">Переместить</span>
+                        <span className="text">{lang.change}</span>
                     </Link>
                 </li>
                 {changeMenuBoardPositionItem && (
@@ -532,13 +536,13 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 )}
                 {deleteItemActive && <div style={{zIndex: 10}} className='tag_open'>
                     <div className='div_dropitem_modal'>
-                        <span className='text_dropitem_modal'>Удаление карточки</span>
+                        <span className='text_dropitem_modal'>{lang.delete_card}</span>
                     </div>
                     <div style={{margin: 15}}>
-                        <span className='text_delete'>Вы точно хотите удалить карточку?</span>
+                        <span className='text_delete'>{lang.delete_tag_conf}</span>
                     </div>
                     <div className='buttons_tag'>
-                        <Link onClick={(e) => {onDeleteItemInBoard(board, item); closeEditHandler(index, i)}} className='delete_tag_full'>Удалить</Link>
+                        <Link onClick={(e) => {onDeleteItemInBoard(board, item); closeEditHandler(index, i)}} className='delete_tag_full'>{lang.delete}</Link>
                     </div>
                     <Link onClick={() => { setDeleteItemActive(false) }} className='icon_close_div'>
                         <AiOutlineClose className='icon_close'></AiOutlineClose>
@@ -548,7 +552,7 @@ const InModalDoalogBoard = ({members, setMembers, user, id, tags, item, colors, 
                 <li className='li_right_menu'>
                     <Link draggable={false}  onClick={() => setDeleteItemActive(true)} className="link_right_menu">
                         <AiOutlineDelete className="icon_link_right_menu"/>
-                        <span className="text">Удалить</span>
+                        <span className="text">{lang.delete}</span>
                     </Link>
                 </li>
             </ul>

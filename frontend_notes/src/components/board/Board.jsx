@@ -19,16 +19,12 @@ import AuthContext from '../context/AuthContext';
 import AddNewItemInput from './AddNewItemInput';
 import Members from './Members';
 import Charts from './Charts';
-
-// TODO: 
-// добавить сохранение смайла в boards
-// добавить загрузку изображения
-// переработать цвета (dark theme, white theme)
-// убрать перекликивание в модальном окне тип 1 раз тыкнул открыл, другой - закрыл.
+import { en_language, ru_language } from '../../services/language';
 
 const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     
-    let {authTokens, setFavoritePages} = useContext(AuthContext)
+    let {authTokens, setFavoritePages, language} = useContext(AuthContext)
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
 
     const [choiceView, setChoiceView] = useState("Доска")
 
@@ -550,6 +546,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     }
     // функция для отработки нового значения для select item
     const setChangeMenuBoardPositionItemClose = () => {
+        
         setChangeMenuBoardPositionItem(false)
         setOldItemPositionBoard(null)
         setNewItemPositionBoard(null)
@@ -730,16 +727,12 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
     const dragOverHendlerEvent = (e, index, i, item) => {
         e.preventDefault();
         if (itemDrag === item) return
-        // console.log(`${index}-${i}`,`${dragActive[0]}-${dragActive[1]}` )
-
-        // if (`${dragActive[0]}-${dragActive[1]}` !== `${index}-${i}`){
-        //     document.getElementById(`${index}-${i}`).style.transform = 'translateY(' + - heightActive + 'px)';
-        //     setDragActive([index, i])
-        // }
         
         e.target.className
     }
     useEffect(() => {
+        
+        setLang(language === "Русский" ? ru_language : en_language);
         const fetchData = async () => {
             const data = await NoteService.getUserInfoBoard(authTokens, id)
             setUserInfo(data)
@@ -804,7 +797,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
             document.removeEventListener("mousedown", handleClickOutsideInDeleteModalDialog)
             document.removeEventListener("mousedown", handleCloseMembers)
         }
-    }, [listBoards, members, datePicker, deleteItemActive, menuBoard, emojiOpen, changeMenuBoardPositionItem, changeMenuBoardPositionItemInLink, showYourElement, newTagOpenInTag, newInTag, tagEditInTag, deleteBoardActive])
+    }, [choiceView, language, listBoards, members, datePicker, deleteItemActive, menuBoard, emojiOpen, changeMenuBoardPositionItem, changeMenuBoardPositionItemInLink, showYourElement, newTagOpenInTag, newInTag, tagEditInTag, deleteBoardActive])
     
     
     return (
@@ -815,12 +808,11 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     <div className='table_body'>
                         <div className='table_body_2'>
                             <div className='header_info_table'>
-                                <span className='columnheader'></span>
-                                <span className='columnheader'>Карточка</span>
-                                <span className='columnheader'>Список</span>
-                                <span className='columnheader'>Метки</span>
-                                <span className='columnheader'>Участники</span>
-                                <span className='columnheader'>Срок</span>
+                                <span className='columnheader'>{lang.name_card}</span>
+                                <span className='columnheader'>{lang.list}</span>
+                                <span className='columnheader'>{lang.tag}</span>
+                                <span className='columnheader'>{lang.member}</span>
+                                <span className='columnheader'>{lang.time}</span>
                             </div>
                             <div className='scroll'>
                             {boards.sort((a, b) => a.position - b.position).map((board, index) => 
@@ -833,12 +825,11 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                         onDragStart={(e) => {dragStartHendlerEvent(e, index, i, item)}}
                                         onDragOver={(e) => {dragOverHendlerEvent(e, index, i, item)}}
                                         className="item_table">
-                                            <span className='next_item_board'><AiOutlineHolder className='icon_table' /></span>
                                             <span className='next_item_board'>{item.title}</span>
                                             <span className='next_item_board'>{board.title}</span>
                                             <span className='next_item_board'>
                                                 {item.tag?.map((tag, j)=>
-                                                    <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`Цвет: ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, название: "${tag.text}"`} className="tag_table_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
+                                                    <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`${lang.color_tooltip} ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, ${lang.name_tooltip} "${tag.text}"`} className="tag_table_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
                                                         <span className='span_c_text' style={{color: colors[colors.findIndex(color => color.color_text === tag.color)].text_color}}>{ tag.text }</span>
                                                     </div>
                                                 )}
@@ -854,7 +845,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                             <span className='next_item_board'>
                                                 {item.datepicker && 
                                                         <>
-                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? "Срок карточки истекает не скоро" : getColor(item.datepicker) === "#F87168" ? "Срок действия карточки недавно закончился" : getColor(item.datepicker) === "#5D1F1A" ? "Срок действия карточки давно закончился" : item.datepicker.complete? "Карточка выполнена" : "Срок действия карточки закончится в течении 24 часов"} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
+                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? `${lang.time_not_soon}` : getColor(item.datepicker) === "#F87168" ? `${lang.time_recently_ended}` : getColor(item.datepicker) === "#5D1F1A" ? `${lang.time_ended}` : item.datepicker.complete? `${lang.time_ok}` : `${lang.time_end_soon}`} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
                                                                 {isHovered === `${index}-${i}`? item.datepicker.complete? <AiOutlineCheckSquare className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> : <AiOutlineBorder className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> :  <AiOutlineClockCircle className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/>}
                                                                 <span className={getColor(item.datepicker) === "" ? "datepicker_date_color_text" : `datepicker_date`}>{formatDate(new Date(item.datepicker.date))}</span>
                                                             </div>
@@ -880,7 +871,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     </div>
                 </div>
             }
-            { choiceView === "Доска" &&
+            { choiceView === 'Доска' &&
                 <div className={`app`}>
                     {boards.sort((a, b) => a.position - b.position).map((board, index) => 
                         <div key={index}  
@@ -984,7 +975,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                                 </div>
                                                 <div className="tags_header">
                                                     {item.tag?.map((tag, j)=>
-                                                        <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`Цвет: ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, название: "${tag.text}"`} className="tags_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
+                                                        <div data-tooltip-id={`${index}-tag`} data-tooltip-content={`${lang.color_tooltip} ${colors[colors.findIndex(color => color.color_text === tag.color)].text}, ${lang.name_tooltip} "${tag.text}"`} className="tags_item" onClick={() => {tagsOpen? setTagsOpen(false) : setTagsOpen(true)}} key={j} style={{background: colors[colors.findIndex(color => color.color_text === tag.color)].color}}>
                                                             {tagsOpen && (<span className='span_c_text' style={tag.text ? {color: colors[colors.findIndex(color => color.color_text === tag.color)].text_color}: {opacity: 0}}>{ tag.text ? tag.text : "none" }</span>)}
                                                             {!tagsOpen && (<span className='span_c_text'>none</span>)}
                                                         </div>
@@ -996,7 +987,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                                 <div className='bottom_info_item'>
                                                     {item.datepicker && 
                                                         <>
-                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? "Срок карточки истекает не скоро" : getColor(item.datepicker) === "#F87168" ? "Срок действия карточки недавно закончился" : getColor(item.datepicker) === "#5D1F1A" ? "Срок действия карточки давно закончился" : item.datepicker.complete? "Карточка выполнена" : "Срок действия карточки закончится в течении 24 часов"} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
+                                                            <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={getColor(item.datepicker) === "" ? `${lang.time_not_soon}` : getColor(item.datepicker) === "#F87168" ? `${lang.time_recently_ended}` : getColor(item.datepicker) === "#5D1F1A" ? `${lang.time_ended}` : item.datepicker.complete? `${lang.time_ok}` : `${lang.time_end_soon}`} onClick={() => setCompleteDate(item, board)} onMouseLeave={() => setIsHovered(null)} onMouseEnter={() => setIsHovered(`${index}-${i}`)} className="clock_datepicker" style={{background: getColor(item.datepicker)}}>
                                                                 {isHovered === `${index}-${i}`? item.datepicker.complete? <AiOutlineCheckSquare className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> : <AiOutlineBorder className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/> :  <AiOutlineClockCircle className={getColor(item.datepicker) === "" ? "clock_date_color_text" : 'clock_date'}/>}
                                                                 <span className={getColor(item.datepicker) === "" ? "datepicker_date_color_text" : `datepicker_date`}>{formatDate(new Date(item.datepicker.date))}</span>
                                                             </div>
@@ -1004,15 +995,15 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                                                         </>
                                                     }
                                                     {item?.members?.filter(item => item?.id === userInfo?.id).length > 0 && 
-                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Вы подписаны на эту карточку"} className="comment_bottom">    
+                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={lang.card_signed} className="comment_bottom">    
                                                             <AiOutlineEye className='comment_icon' />
                                                         </div>
                                                     }
-                                                    {item.comment && <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с описанием"} className="comment_bottom">
+                                                    {item.comment && <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={lang.card_description} className="comment_bottom">
                                                         <AiOutlineAlignLeft className='comment_icon'/> 
                                                     </div>}
                                                     {item.investment?.length !== 0 &&
-                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={"Эта карточка с вложениями"} className="comment_bottom">
+                                                        <div data-tooltip-id={`${index}-${i}`} data-tooltip-content={lang.card_attachments} className="comment_bottom">
                                                             <AiOutlinePaperClip className='comment_icon'/> 
                                                             <span className='length'>{item.investment?.length}</span>
                                                         </div>
@@ -1072,19 +1063,19 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                             <li className='li_dialog'>
                                 <Link onClick={() => { openCard();  }} className='link_dialog'>
                                     <AiOutlineCreditCard className="icon_link_right_menu"/>
-                                    <span className="text">Открыть карточку</span>
+                                    <span className="text">{lang.open_card}</span>
                                 </Link>
                             </li>
                             <li className='li_dialog'>
                                 <Link onClick={() => { setNewTagOpenInTag(!newTagOpenInTag) }} className='link_dialog'>
                                     <AiOutlineTag className="icon_link_right_menu"/>
-                                    <span className="text">Изменить метки</span>
+                                    <span className="text">{lang.change_tag}</span>
                                 </Link>
                             </li>
                             <li className='li_dialog'>
                                 <Link onClick={() => {setMembers(true)}} className='link_dialog'> 
                                     <AiOutlineTeam className="icon_link_right_menu"/>
-                                    <span className="text">Изменить участников</span>
+                                    <span className="text">{lang.change_member}</span>
                                 </Link>
                             </li>
                             {
@@ -1108,7 +1099,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                             <li className='li_dialog'>
                                 <Link onClick={() => {datePicker? setDatePicker(false) : setDatePicker(true); }} className='link_dialog'>
                                     <AiOutlineClockCircle className="icon_link_right_menu"/>
-                                    <span className="text">Изменить дату</span>
+                                    <span className="text">{lang.change_time}</span>
                                 </Link>
                             </li>
                             <DeleteModal deleteItemActive={deleteItemActive} deleteCard={deleteCard} setDeleteItemActive={setDeleteItemActive}/>
@@ -1125,14 +1116,14 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                             <li className='li_dialog'>
                                 <Link onClick={() => { changeCardPos() }} className='link_dialog'>
                                     <AiOutlineArrowRight className="icon_link_right_menu"/>
-                                    <span className="text">Переместить</span>
+                                    <span className="text">{lang.change}</span>
                                 </Link>
                             </li>
                             
                             <li className='li_dialog'>
                                 <Link onClick={() => { setDeleteItemActive(true) }} className='link_dialog'>
                                     <AiOutlineDelete className="icon_link_right_menu"/>
-                                    <span className="text">Удалить</span>
+                                    <span className="text">{lang.delete}</span>
                                 </Link>
                             </li>
                             
@@ -1140,7 +1131,7 @@ const Board = ( { listBoards, id, updatePage, setUpdatePage} ) => {
                     </div>
                     
                     <Link onClick={() => {saveTextItem()}} style={{ zIndex: 1, marginLeft: 5  }} className='btn_save'>
-                        <span>Сохранить</span>
+                        <span>{lang.save}</span>
                     </Link>
                 </div>
                 <TagEdit 

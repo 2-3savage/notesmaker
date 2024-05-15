@@ -7,9 +7,11 @@ import { AiOutlineClose, AiOutlineUsergroupAdd } from "react-icons/ai";
 import AuthContext from '../context/AuthContext';
 import { NoteService } from '../../services/note.service';
 import NewPage from './NewPage';
+import { en_language, ru_language } from '../../services/language';
 
 const Menu = ({children, logoutUser}) => {
-  let {authTokens, history} = useContext(AuthContext)
+  let {authTokens, history, language} = useContext(AuthContext)
+  const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
   const [switchNav, setSwitch] = useState(localStorage.getItem('switchNav') || 'white');
   const [navbar, setNavbar] = useState(localStorage.getItem('sidebar') || 'open') // true = open, false = close toggle
 
@@ -72,6 +74,7 @@ const Menu = ({children, logoutUser}) => {
     setUserInfo(data)
   }
   useEffect(() =>{
+    setLang(language === "Русский" ? ru_language : en_language);
     const fetchData = async () => {
       const data = await NoteService.getUserInfo(authTokens)
       setUserInfo(data)
@@ -85,7 +88,7 @@ const Menu = ({children, logoutUser}) => {
       document.removeEventListener("mousedown", handleClickOutsideInCreatePage)
       document.removeEventListener("mousedown", handleClickOutsideInNotification)
     }
-  }, [navbar, switchNav, modalInfoIsOpen, notifications])
+  }, [navbar, switchNav, modalInfoIsOpen, notifications, language])
 
   return (<>
     <nav className={`${styles.sidebar} ${toggleNav} ${switchDarkMode}`}>
@@ -102,7 +105,7 @@ const Menu = ({children, logoutUser}) => {
       {notifications && 
         <div id="notification" className={styles.modal_notifications}>
           <div className={styles.div_dropitem_modal}>
-            <span className={styles.text_dropitem_modal}>Уведомления</span>
+            <span className={styles.text_dropitem_modal}>{lang.notifications}</span>
           </div>
           <div id="notifications" className={styles.notifications}>
             {userInfo.invitations.length === 0 && 
@@ -111,7 +114,7 @@ const Menu = ({children, logoutUser}) => {
                   <img className={styles.image_notifications} src='https://clipartcraft.com/images/puppy-clipart-sleeping-4.png'></img>
                 </div>
                 <div className={styles.text_image}>
-                  Нет непрочитанных уведомлений
+                  {lang.no_notifications}
                 </div>
                 
               </div>
@@ -124,8 +127,8 @@ const Menu = ({children, logoutUser}) => {
                     <AiOutlineUsergroupAdd className={styles.image_notification}/>
                   </div>
                   <div className={styles.info_notification}>
-                    <span className={styles.text_notification}>Приглашение от {item.inviter.username}</span>
-                    <span className={styles.text_notification_more}>Приглашение на доску {item.board.title} от пользователя {item.inviter.username}</span>
+                    <span className={styles.text_notification}>{lang.invation_on} {item.inviter.username}</span>
+                    <span className={styles.text_notification_more}>{lang.invation_board} {item.board.title} {lang.user_invation} {item.inviter.username}</span>
                   </div>
                   <div className={styles.time}>
                     <span className={styles.text_notification_more}>{dateFunc(item)}</span>
@@ -134,21 +137,21 @@ const Menu = ({children, logoutUser}) => {
                 {item.status === 'pending' && 
                   <div className={styles.buttons_notification}>
                     <Link onClick={() => handleAddBoardUserNotification(item)} className={styles.add_board_notification}>
-                      <span>Принять</span>
+                      <span>{lang.accepted}</span>
                     </Link>
                     <Link onClick={() => handlePassBoardUserNotification(item)} className={styles.pass_board_notification}>
-                      <span>Отказаться</span>
+                      <span>{lang.rejected}</span>
                     </Link>
                   </div>
                 }
                 {item.status === 'accepted' && 
                   <div className={styles.notification_sms}>
-                    <span className={styles.text_notification}>Вы приняли предложение</span>
+                    <span className={styles.text_notification}>{lang.accepted_invation}</span>
                   </div>
                 }
                 {item.status === 'rejected' && 
                   <div className={styles.notification_sms}>
-                    <span className={styles.text_notification}>Вы отказались от предложения</span>
+                    <span className={styles.text_notification}>{lang.rejected_invation}</span>
                   </div>
                 }
                 

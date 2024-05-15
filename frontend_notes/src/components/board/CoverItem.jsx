@@ -7,8 +7,10 @@ import { NoteService } from '../../services/note.service';
 import UserDatails from './UserDatails';
 import AuthContext from '../context/AuthContext';
 import ModalDialogBoard from './ModalDialogBoard';
+import { en_language, ru_language } from '../../services/language';
 const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, setStar, userInfo, setUserInfo, title, user, chosenEmoji, emojiOpen, onEmojiClick, setEmojiOpen, id}) => {
-    let {authTokens, setFavoritePages, history, setListPages} = useContext(AuthContext)
+    let {language, authTokens, setFavoritePages, history, setListPages} = useContext(AuthContext)
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
     const handleStar = async (e) => {
         if (star){
             const data = await NoteService.removeBoardFavorite(parseInt(id), parseInt(userInfo.id))
@@ -45,7 +47,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
         const data = await NoteService.getFavoritesBoards(authTokens)
         setListPages(data.boards_not_like)
         setFavoritePages(data.boards_like)
-        await history('/')
+        await history('/home')
     } 
     const deleteUserInBoard = async (item) => {
         const data = await NoteService.removeUserInBoard(id, item.id)
@@ -57,7 +59,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
         const data2 = await NoteService.getFavoritesBoards(authTokens)
         setListPages(data2.boards_not_like)
         setFavoritePages(data2.boards_like)
-        await history('/')
+        await history('/home')
     }
     const [userDatails, setUserDatails] = useState([]);
     const [addUserBoard, setAddUserBoard] = useState(false)
@@ -105,6 +107,17 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
         }
 
     }
+    const roleTranslatorMain = (word) => {
+        switch (word) {
+            case "creator":
+              return lang.creator_board
+            case "admin":
+              return lang.admin_board
+            case "participant":
+              return lang.member_board
+        }
+
+    }
     const handleClickOutsideUserInfoRole = (e) => {
         const container = document.querySelector(".user_role_change")
         if (!container?.contains(e.target)){
@@ -129,13 +142,14 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
         document.addEventListener("mousedown", handleClickOutsideUserInfoRole)
         document.addEventListener("mousedown", handleClickOutsideInModalDialog)
         getInvationsInBoard()
+        setLang(language === "Русский" ? ru_language : en_language);
         return () => {
             document.addEventListener("mousedown", handleClickOutsideUserInfoRoleInvite)
             document.removeEventListener("mousedown", handleClickOutsideInModalDialog)
             document.addEventListener("mousedown", handleClickOutsideUserInfoRole)
             document.removeEventListener("mousedown", handleClickOutsideUserInfo)
         }
-    }, [modalDialog, modalMenu, users])
+    }, [choiceView, modalDialog, language, modalMenu, users])
     return (
         <>
             <div draggable={false} className="cover_div">
@@ -150,11 +164,11 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                         </div>
                         {star ? (<Link draggable={false} onClick={handleStar} style={{marginLeft: -200}} className='icon_form'><AiFillStar  draggable={false} className='icon_star'/></Link>) : (<Link draggable={false} style={{marginLeft: -200}} onClick={handleStar} className='icon_form'><AiOutlineStar  className='icon_star'/></Link>)}
                         <div>
-                        <Link draggable={false} onClick={() => modalDialog ? setModalDialog(false) : setModalDialog(true)} style={{marginLeft: 25}} className='button_link_share'><AiOutlineRead className='icon_min'></AiOutlineRead>{choiceView}<AiOutlineDown className='icon_min'></AiOutlineDown></Link>
+                        <Link draggable={false} onClick={() => modalDialog ? setModalDialog(false) : setModalDialog(true)} style={{marginLeft: 25}} className='button_link_share'><AiOutlineRead className='icon_min'></AiOutlineRead>{choiceView === "Доска" ? lang.board : choiceView === "Таблица" ? lang.table : lang.panel}<AiOutlineDown className='icon_min'></AiOutlineDown></Link>
                             {modalDialog && 
                                 <div className='modal_choice'>
                                     <div className='div_dropitem_modal'>
-                                        <span className='text_dropitem_modal'>Режим просмотра</span>
+                                        <span className='text_dropitem_modal'>{lang.view_mode}</span>
                                     </div>
                                     <Link onClick={() => {setModalDialog(false)}} className='icon_close_div'>
                                         <AiOutlineClose className='icon_close'></AiOutlineClose>
@@ -163,19 +177,19 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                         <div onClick={() => {setChoiceView("Доска"); setModalDialog(false)} } className='btn_choice'>
                                             <li className='div_choice_btn'>
                                                 <AiOutlineProject className='icon_choice'/>
-                                                <span>Доска</span>
+                                                <span>{lang.board}</span>
                                             </li>
                                         </div>
                                         <div onClick={() => {setChoiceView("Таблица"); setModalDialog(false)}} className='btn_choice'>
                                             <li className='div_choice_btn'>
                                                 <AiOutlineSchedule className='icon_choice'/>
-                                                <span>Таблица</span>
+                                                <span>{lang.table}</span>
                                             </li>
                                         </div>
                                         <div onClick={() => {setChoiceView("Панель"); setModalDialog(false)}} className='btn_choice'>
                                             <li className='div_choice_btn'>
                                                 <AiOutlineDashboard className='icon_choice'/>
-                                                <span>Панель</span>
+                                                <span>{lang.panel}</span>
                                             </li>
                                         </div>
                                     </ul>
@@ -213,7 +227,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                             </div>
                         ))}
                         
-                        <Link onClick={() => {setAddUserBoard(true)}} draggable={false} style={{marginLeft: 10}} className='button_link_share'><AiOutlineUserAdd style={{marginRight: 5}}/> Поделиться</Link>
+                        <Link onClick={() => {setAddUserBoard(true)}} draggable={false} style={{marginLeft: 10}} className='button_link_share'><AiOutlineUserAdd style={{marginRight: 5}}/> {lang.share}</Link>
                         
                             
                         {addUserBoard && 
@@ -221,24 +235,23 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                             <div className='user_datails'>
                                 <div className="header_div_modal">
                                     <div className='text_header'>
-                                        Поделиться доской
+                                        {lang.share_board}
                                     </div>
                                     <Link onClick={() => setAddUserBoard(false)} className='icon_close_div'>
                                         <AiOutlineClose className='icon_close_user_exit'></AiOutlineClose>
                                     </Link>
                                     
                                 </div>
-                                <input className="input_line" placeholder="Адрес электронной почты" onChange={handleInputSearchUser}></input>
+                                <input className="input_line" placeholder={lang.email} onChange={handleInputSearchUser}></input>
                                 {users !== null && users !== 0 && 
                                     <div className='invite_user'>
                                         {users < 3 ? <div className='invite_modal'>
                                             <span className='header_invite'>
-                                                Похоже, этот человек еще не участник Notesmaker. Добавьте адрес его электронной почты, чтобы пригласить.
+                                                {lang.error_member}
                                             </span>
                                         </div> :
                                             users?.map((item, index) => 
                                                 <div key={index}>
-                                                    {console.log()}
                                                     { user?.filter(user => user.id === item.id)[0] !== undefined ?
                                                         <Link className="link_disabled">
                                                             <img draggable={false}
@@ -247,7 +260,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                                             />
                                                             <div className='info_item_dialog_modal'>
                                                                 <span className='top_info_item'>{item.username}</span>
-                                                                <span className='botom_info_item'>{item.email} • {roleTranslator(user?.filter(user => user.id === item.id)[0]?.user?.rights)}</span>
+                                                                <span className='botom_info_item'>{item.email} • {roleTranslatorMain(user?.filter(user => user.id === item.id)[0]?.user?.rights)}</span>
                                                             </div>
                                                         </Link>
                                                         : invations?.filter(user => user.invitee.id === item.id)[0] !== undefined ?
@@ -258,7 +271,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                                             />
                                                             <div className='info_item_dialog_modal'>
                                                                 <span className='top_info_item'>{item.username}</span>
-                                                                <span className='botom_info_item'>{item.email} • Ожидание ответа на приглашение</span>
+                                                                <span className='botom_info_item'>{item.email} • {lang.expectation}</span>
                                                             </div>
                                                         </Link> 
                                                         :
@@ -291,29 +304,29 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                         />
                                         <div className='info_item_dialog_modal'>
                                             <span className='top_info_item'>{item.username}</span>
-                                            <span className='botom_info_item'>{item.email} • {roleTranslator(item.user.rights)}</span>
+                                            <span className='botom_info_item'>{item.email} • {roleTranslatorMain(item.user.rights)}</span>
                                         </div>
-                                        <button className='button_role' onClick={() => {setModalMenu(i)}}><span className='span_role_modal'>{roleTranslator(item.user.rights)}</span><AiOutlineDown className='icon_modal_role'/></button>
+                                        <button className='button_role' onClick={() => {setModalMenu(i)}}><span className='span_role_modal'>{roleTranslatorMain(item.user.rights)}</span><AiOutlineDown className='icon_modal_role'/></button>
                                         { modalMenu === i && 
                                         <div className='user_role_change'>
                                             { userInfo.id === item.id ?
                                                 <>
                                                 <button className={roleTranslator(userInfo.right) === "Создатель доски" ? 'btn_active_role' : 'btn_disabled_role'}>
-                                                    <span>Создатель доски</span>
+                                                    <span>{lang.creator_board}</span>
                                                 </button> 
                                                 <button className={roleTranslator(userInfo.right) === "Администратор доски" ? 'btn_active_role' : 'btn_disabled_role'}>
-                                                    <span>Администратор доски</span>
+                                                    <span>{lang.admin_board}</span>
                                                 </button> 
                                                 <button className={roleTranslator(userInfo.right) === "Участник доски" ? 'btn_active_role' : 'btn_disabled_role'}>
-                                                    <span>Участник доски</span>
+                                                    <span>{lang.member_board}</span>
                                                 </button> 
                                                 {roleTranslator(userInfo.right) === "Создатель доски" ?
                                                     <button onClick={() => {deleteBoard()}} className='btn_change_role'>
-                                                        <span>Удалить доску</span>
+                                                        <span>{lang.delete_board}</span>
                                                     </button>
                                                     :
                                                     <button onClick={() => {deleteUserInBoardMe(item)}} className='btn_change_role'>
-                                                        <span>Выйти с доски</span>
+                                                        <span>{lang.exit}</span>
                                                     </button>
                                                 }
                                                 
@@ -321,91 +334,91 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                             : roleTranslator(userInfo.right) === "Создатель доски" && roleTranslator(item.user.rights) === "Участник доски" ?
                                                 <>
                                                     <button onClick={() => updateBoardRole(item, userInfo, "creator")} className={'btn_change_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button onClick={() => updateBoardRole(item, userInfo, "admin")} className={'btn_change_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button className='btn_active_role'>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button onClick={() => deleteUserInBoard(item)}  className='btn_change_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </>
                                                 : roleTranslator(userInfo.right) === "Создатель доски" && roleTranslator(item.user.rights) === "Администратор доски" ?
                                                 <>
                                                     <button onClick={() => updateBoardRole(item, userInfo, "creator")} className={'btn_change_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button className={'btn_active_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button onClick={() => updateBoardRole(item, userInfo, "participant")} className={"btn_change_role"}>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button onClick={() => deleteUserInBoard(item)} className='btn_change_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </>
                                                 : (roleTranslator(userInfo.right) === "Администратор доски" || roleTranslator(userInfo.right) === "Участник доски") && roleTranslator(item.user.rights) === "Создатель доски" ?
                                                 <>
                                                     <button className={'btn_active_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button className='btn_disabled_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </>
                                                 : (roleTranslator(userInfo.right) === "Администратор доски" || roleTranslator(userInfo.right) === "Участник доски") && roleTranslator(item.user.rights) === "Администратор доски" ?
                                                 <>
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button className={'btn_active_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button className='btn_disabled_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </>
                                                 : roleTranslator(userInfo.right) === "Администратор доски" && roleTranslator(item.user.rights) === "Участник доски" ?
                                                 <>
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button className={'btn_active_role'}>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button onClick={() => deleteUserInBoard(item)} className='btn_change_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </> 
                                                 :
                                                 <>
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Создатель доски</span>
+                                                        <span>{lang.creator_board}</span>
                                                     </button> 
                                                     <button className={'btn_disabled_role'}>
-                                                        <span>Администратор доски</span>
+                                                        <span>{lang.admin_board}</span>
                                                     </button> 
                                                     <button className={'btn_active_role'}>
-                                                        <span>Участник доски</span>
+                                                        <span>{lang.member_board}</span>
                                                     </button> 
                                                     <button className='btn_disabled_role'>
-                                                        <span>Удалить с доски</span>
+                                                        <span>{lang.delete_in_board}</span>
                                                     </button>
                                                 </>
                                             }
@@ -426,7 +439,7 @@ const CoverItem = ({setChoiceView, choiceView, setDragMember, setUser, star, set
                                            
                                             <div className='info_item_dialog_modal'>
                                                 <span className='top_info_item'>{item?.invitee.username}</span>
-                                                <span className='botom_info_item'>{item?.invitee.email} • Ожидание ответа на приглашение</span>
+                                                <span className='botom_info_item'>{item?.invitee.email} • {lang.expectation}</span>
                                             </div>
                                         </div>
                                         

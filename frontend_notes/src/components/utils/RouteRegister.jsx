@@ -7,7 +7,7 @@ import NavbarAuth from './NavbarAuth';
 const RouteRegister = () => {
     let {} = useContext(AuthContext)
     let user = localStorage.getItem('authTokens') ?  jwtDecode(localStorage.getItem('authTokens')) : null
-    return user ? <Navigate to={'/'}/> : 
+    return user ? <Navigate to={'/home'}/> : 
         <NavbarAuth>
             <Outlet/>
         </NavbarAuth>

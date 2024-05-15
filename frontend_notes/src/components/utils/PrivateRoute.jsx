@@ -7,7 +7,7 @@ const PrivateRoute = () => {
     let {logoutUser} = useContext(AuthContext)
     let user = localStorage.getItem('authTokens') ?  jwtDecode(localStorage.getItem('authTokens')) : null
     
-    return user ? <Menu logoutUser={logoutUser}><Outlet /></Menu> : <Navigate to="/login" />;
+    return user ? <Menu logoutUser={logoutUser}><Outlet /></Menu> : <Navigate to="/" />;
 }
 
 export default PrivateRoute

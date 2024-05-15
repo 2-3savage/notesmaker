@@ -8,11 +8,12 @@ import  { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { NoteService } from '../../../services/note.service'
 import AuthContext from '../../context/AuthContext'
+import { en_language, ru_language } from '../../../services/language'
 
 const MainMenu = ( {notifications, setNotifications, toggleNavbar , navbar, setModalInfoIsOpen, modalInfoIsOpen} ) => {
-  let {logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
+  let {language, logoutUser, authTokens, history, listFavoritePages, setFavoritePages, userInfo, setUserInfo} = useContext(AuthContext)
   const [iconSelection, setIconSelection] = useState(styles.close_icon_modal)
-
+  const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
   function handleClickOutside(event) {
     const container = document.querySelector(`.${styles.marketing_hub_container_modal}`);
     const container2 = document.querySelector(`.${styles.img_icon_page_div}`);
@@ -22,11 +23,12 @@ const MainMenu = ( {notifications, setNotifications, toggleNavbar , navbar, setM
     }
   }
   useEffect(() => {
+    setLang(language === "Русский" ? ru_language : en_language);
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [iconSelection])
+  }, [iconSelection, language])
   
   
   return (
@@ -34,18 +36,17 @@ const MainMenu = ( {notifications, setNotifications, toggleNavbar , navbar, setM
       <div className={styles.menu}>
             <SearchItem Icon={AiOutlineSearch} toggleNavbar={toggleNavbar} navbar={navbar}/>
             <ul className={styles.menu_links}>
-                <MenuItem Icon={ BsFillHouseFill } text={'Home'} route={'/home'}/>
-                <MenuItem Icon={ AiFillCalendar } text={'Calendar'} route={'/calendar'}/>
+                <MenuItem Icon={ BsFillHouseFill } text={lang.home} route={'/home'}/>
                 <li className={styles.nav_link}>
                   <Link onClick={notifications ? () => setNotifications(false) : () => {setNotifications(true);setModalInfoIsOpen(false)}} className={styles.a}>
                       <AiFillBell className={styles.icon}/>
-                      <span className={`${styles.text} ${styles.nav_text}`}>{'Notifications'}</span>
+                      <span className={`${styles.text} ${styles.nav_text}`}>{lang.notifications}</span>
                   </Link>
                 </li>
                 <li className={styles.nav_link}>
                   <Link onClick={modalInfoIsOpen ? () => setModalInfoIsOpen(false) : () => {setModalInfoIsOpen(true);setNotifications(false)}} className={styles.a}>
                       <AiFillPlusCircle className={styles.icon}/>
-                      <span className={`${styles.text} ${styles.nav_text}`}>{'New page'}</span>
+                      <span className={`${styles.text} ${styles.nav_text}`}>{lang.new_page}</span>
                   </Link>
                 </li>
                 {listFavoritePages?.map((item, index) => 

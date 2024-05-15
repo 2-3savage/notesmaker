@@ -59,10 +59,10 @@ export const AuthProvider = ({children}) => {
             setAuthTokens(data)
             localStorage.setItem('authTokens', JSON.stringify(data))
             localStorage.removeItem('email')
-            history('/')
+            history('/home')
         }else{
             localStorage.removeItem('email')
-            history('/')
+            history('/home')
         }
         
     }
@@ -156,7 +156,7 @@ export const AuthProvider = ({children}) => {
             setAuthTokens(data)
             localStorage.removeItem('email')
             localStorage.setItem('authTokens', JSON.stringify(data))
-            history('/')
+            history('/home')
         }
         return data
     } 
@@ -165,7 +165,7 @@ export const AuthProvider = ({children}) => {
         setAuthTokens(null)
         localStorage.removeItem('authTokens')
         localStorage.removeItem('lastTokenRefreshTime')
-        history('/login')
+        history('/')
     }
 
     let updateToken = async () => {
@@ -223,7 +223,21 @@ export const AuthProvider = ({children}) => {
             setUserInfo(data)
         }
         fetchData()
-        
+        const fetchData2 = async () => {
+            const data = await NoteService.getFavoritesBoards(authTokens)
+            const data2 = await NoteService.getUserInfo(authTokens)
+            if (data === -1){
+              logoutUser()
+            }else if (data === 0){
+              setListPages(null)
+            }
+            else{
+              setListPages(data.boards_not_like)
+              setFavoritePages(data.boards_like)
+              setUserInfo(data2)
+            }
+        }
+        fetchData2()
         let lastTokenRefreshTime = localStorage.getItem('lastTokenRefreshTime');
         let currentTime = new Date().getTime();
         let timeSinceLastRefresh = currentTime - lastTokenRefreshTime;

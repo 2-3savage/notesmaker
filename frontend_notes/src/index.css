@@ -44,6 +44,7 @@ body.dark {
     --text-disabled: #BFDBF847;
 }
 :root{
+    --text: #172B4D;
     --text-disabled: #091E424F;
     --btn-role-color-active: #0C66E4;
     --btn-role-background-active: #E9F2FF;

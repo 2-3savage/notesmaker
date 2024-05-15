@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AiOutlineDelete, AiOutlinePlus,AiOutlineLeft, AiOutlineInsertRowLeft,  AiOutlineEllipsis, AiOutlineClose } from 'react-icons/ai'
 import { NoteService } from '../../services/note.service'
+import { en_language, ru_language } from '../../services/language'
+import AuthContext from '../context/AuthContext'
 const HeaderItemBoard = ({ deleteBoardActive, setDeleteBoardActive, boards, board, newBoardPosition, menuBoard, index,  changeMenuBoard, addItemInMenu, setChangeMenuBoard, deleteBoard, tableRearrangement, menuBoardActive, changeBoard, setMenuBoard}) => {
     const [title, setTitle] = useState( board.title )
+    let {authTokens, setFavoritePages, language} = useContext(AuthContext)
     const [elementActive, setElementActive] = useState(false)
-    
+    const [ lang, setLang ] = useState(language === "Русский" ? ru_language : en_language);
     const contentRefs = useRef(null)
     const elementActiveClick = () => {
         setElementActive(true)
@@ -31,12 +34,13 @@ const HeaderItemBoard = ({ deleteBoardActive, setDeleteBoardActive, boards, boar
         setElementActive(false)
     }
     useEffect(() => {
+        setLang(language === "Русский" ? ru_language : en_language);
         setTitle(board.title)
         if (elementActive) document.addEventListener("mousedown", handleClickOutside)
         return () => {
             document.removeEventListener("mousedown", handleClickOutside)
         }
-    }, [elementActive, board]) 
+    }, [elementActive, board, language]) 
   return (
     <div className="header_board">
         <div className="board__title text">    
@@ -51,31 +55,31 @@ const HeaderItemBoard = ({ deleteBoardActive, setDeleteBoardActive, boards, boar
                         <li className='li_dropitem'>
                             <Link draggable={false} onClick={(e) => { addItemInMenu(index)} } className="link">
                                 <AiOutlinePlus className="icon"/>
-                                <span className="text_dropitem">Добавить карточку</span>
+                                <span className="text_dropitem">{lang.add_item}</span>
                             </Link>
                         </li>
                         <li className='li_dropitem'>
                             <Link draggable={false} onClick={() => {setChangeMenuBoard(true);}} className="link">
                                 <AiOutlineInsertRowLeft className="icon"/>
-                                <span className="text_dropitem">Переместить список</span>
+                                <span className="text_dropitem">{lang.move_table_conf}</span>
                             </Link>
                         </li>
                         <li className='li_dropitem'>
                             <Link draggable={false} onClick={() => setDeleteBoardActive(true)} className="link">
                                 <AiOutlineDelete className="icon"/>
-                                <span className="text_dropitem">Удалить список</span>
+                                <span className="text_dropitem">{lang.delete_table_conf}</span>
                             </Link>
                         </li>
                         { deleteBoardActive && 
                             <div style={{zIndex: 10}} className='tag_open'>
                                 <div className='div_dropitem_modal'>
-                                    <span className='text_dropitem_modal'>Удаление списка</span>
+                                    <span className='text_dropitem_modal'>{lang.delete_table}</span>
                                 </div>
                                 <div style={{margin: 15}}>
-                                    <span className='text_delete'>Вы точно хотите удалить список?</span>
+                                    <span className='text_delete'>{lang.confirmation_delete}</span>
                                 </div>
                                 <div className='buttons_tag'>
-                                    <Link onClick={() => deleteBoard(index, board)} className='delete_tag_full'>Удалить</Link>
+                                    <Link onClick={() => deleteBoard(index, board)} className='delete_tag_full'>{lang.delete}</Link>
                                 </div>
                                 <Link onClick={() => setDeleteBoardActive(false)} className='icon_close_div'>
                                     <AiOutlineClose className='icon_close'></AiOutlineClose>
@@ -88,18 +92,18 @@ const HeaderItemBoard = ({ deleteBoardActive, setDeleteBoardActive, boards, boar
                     {changeMenuBoard && (
                     <div className='element_position_change'>
                         <div className='div_dropitem_modal'>
-                            <span className='text_dropitem_modal'>Перемещение</span>
+                            <span className='text_dropitem_modal'>{lang.move_table}</span>
                         </div>
                         <div className='dropitem_position_board'>
                             <select value={newBoardPosition ? newBoardPosition : board.id} onChange={(e) => tableRearrangement(e)}>
-                                <option value="DEFAULT" disabled>Выберите куда поставить таблицу...</option>
+                                <option value="DEFAULT" disabled>{lang.choose_move}</option>
                                 {boards.map((board1, index) => (
-                                    <option key={index} value={board1.id}>{board1 === board? board1.title + " (текущая)": board1.title}</option>
+                                    <option key={index} value={board1.id}>{board1 === board? board1.title + `${lang.now_current}`: board1.title}</option>
                                 ))}
                             </select>
                         </div>
                         <div className='div_change_postion'>
-                            <Link onClick={() => {changeBoard(board)}} className='add_item_link'>Переместить</Link>
+                            <Link onClick={() => {changeBoard(board)}} className='add_item_link'>{lang.move}</Link>
                             <div onClick={() => {setMenuBoard([]); setChangeMenuBoard(false)}} className='icon_close_div'>
                                 <AiOutlineClose  className='icon_close'></AiOutlineClose>
                             </div>   

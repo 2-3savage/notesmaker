@@ -621,6 +621,7 @@ header.open1 .marketing_hub_container2{
   
 .marketing_hub_container2{
     position: absolute;
+    z-index: 10000;
     min-width: 300px;
     background: var(--sidebar-color);
     border-radius: 6px;

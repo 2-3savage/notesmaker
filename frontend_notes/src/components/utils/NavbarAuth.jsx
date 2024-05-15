@@ -30,7 +30,7 @@ const NavbarAuth = ({ children }) => {
             <div className='language'>
             <div className='language_button'>
                 <Link draggable={false} onClick={() => {menu? setMenu(false) : setMenu(true)}} className="link_language">
-                    <span className="text_dropitem">{language}</span>
+                    <span className="text_dropitem2">{language}</span>
                     <AiOutlineDown className="icon_language"/>
                 </Link>
             </div>
@@ -39,12 +39,12 @@ const NavbarAuth = ({ children }) => {
                 <ul className='ul_dropitem_language'>
                     <li className='li_dropitem_language'>
                         <Link draggable={false} onClick={() => {languageLocal("Русский");setMenu(false)}} className="link_language">
-                            <span className="text_dropitem">Русский</span>
+                            <span className="text_dropitem2">Русский</span>
                         </Link>
                     </li>
                     <li className='li_dropitem_language'>
                         <Link draggable={false} onClick={() => {languageLocal("English");setMenu(false)}} className="link_language">
-                            <span className="text_dropitem">English</span>
+                            <span className="text_dropitem2">English</span>
                         </Link>
                     </li>
                 </ul>
